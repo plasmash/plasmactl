@@ -1,41 +1,41 @@
 # List of available OS:
-# - WINDOWS
-# - OS_X
-# - LINUX
+# - windows
+# - darwin
+# - linux
 # List of available processors
-# - AMD64
-# - IA32 (Intel x86)
-# - ARM
+# - amd64
+# - ia32 (Intel x86)
+# - arm
 ifeq ($(OS),Windows_NT)
-    SYSTEM_OS = 'WINDOWS'
+    SYSTEM_OS = windows
     ifeq ($(PROCESSOR_ARCHITEW6432),AMD64)
-        SYSTEM_PROCESSOR = 'AMD64'
+        SYSTEM_PROCESSOR = amd64
     else
         ifeq ($(PROCESSOR_ARCHITECTURE),AMD64)
-        	SYSTEM_PROCESSOR = 'AMD64'
+        	SYSTEM_PROCESSOR = amd64
         endif
         ifeq ($(PROCESSOR_ARCHITECTURE),x86)
-        	SYSTEM_PROCESSOR = 'IA32'
+        	SYSTEM_PROCESSOR = ia32
         endif
     endif
 else
     UNAME_S := $(shell uname -s)
     ifeq ($(UNAME_S),Linux)
-	    SYSTEM_OS = 'LINUX'
+	    SYSTEM_OS = linux
     endif
     ifeq ($(UNAME_S),Darwin)
-        SYSTEM_OS = 'OS_X'
+        SYSTEM_OS = darwin
         CUID=1000
         CGID=1000
     endif
     UNAME_P := $(shell uname -p)
     ifeq ($(UNAME_P),x86_64)
-       	SYSTEM_PROCESSOR = 'AMD64'
+       	SYSTEM_PROCESSOR = amd64
     endif
     ifneq ($(filter %86,$(UNAME_P)),)
-        SYSTEM_PROCESSOR = 'IA32'
+        SYSTEM_PROCESSOR = ia32
     endif
     ifneq ($(filter arm%,$(UNAME_P)),)
-        SYSTEM_PROCESSOR = 'ARM'
+        SYSTEM_PROCESSOR = arm
     endif
 endif
