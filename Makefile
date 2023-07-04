@@ -4,6 +4,8 @@ BINARY_REPO := github.com/launchrctl/launchr
 BINARY_URL := https://${BINARY_REPO}
 BINARY_NAME := launchr_${UNAME_S}_${UNAME_P}
 BINARY_CHECKSUM_EXPECTED := $(shell curl -sL ${BINARY_URL}/releases/latest/download/checksums.txt | grep "${BINARY_NAME}" | awk '{print $$1}')
+ALL_SYSTEM_OS := linux windows darwin
+ALL_SYSTEM_PROCESSOR := amd64 arm64
 
 xx:
 	@echo "${SYSTEM_OS}"
@@ -27,7 +29,13 @@ provision:
 ## target desc build
 build:
 	echo build
-	GOOS=${SYSTEM_OS} GOARCH=${SYSTEM_PROCESSOR} ./${BINARY_NAME} build -p github.com/launchrctl/compose -n plasmactl # Does it provide .exe extension ?
+	$(foreach os,$(ALL_SYSTEM_OS), \
+		$(foreach processor,$(ALL_SYSTEM_PROCESSOR), \
+			echo "${os}_${processor}" ; \
+		) \
+	)
+
+	#GOOS=${SYSTEM_OS} GOARCH=${SYSTEM_PROCESSOR} ./${BINARY_NAME} build -p github.com/launchrctl/compose -n plasmactl # Does it provide .exe extension ?
 
 .PHONY: push
 ## target desc push
