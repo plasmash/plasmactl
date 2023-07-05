@@ -4,7 +4,7 @@ variables:
   GIT_DEPTH: "1"
   GIT_STRATEGY: fetch
 
-image: alpine:latest
+image: ubuntu:latest
 
 before_script:
   - date
@@ -26,7 +26,7 @@ stages:
 push:
   stage: main
   before_script:
-    - apk add openssl make curl
+    - apt-get update && apt-get install openssl make curl
   script:
     - PLASMACTL_ARTIFACT_REPOSITORY_USER_PW_TMP="$(echo "${PLASMACTL_ARTIFACT_REPOSITORY_USER_PW_BASE64}" | base64 -d)"
     - make all PLASMACTL_ARTIFACT_REPOSITORY_USER_PW='${PLASMACTL_ARTIFACT_REPOSITORY_USER_PW_TMP}'

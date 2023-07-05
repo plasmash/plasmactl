@@ -45,9 +45,6 @@ build:
 push:
 	@echo "- Action: push"
 	$(if $(PLASMACTL_ARTIFACT_REPOSITORY_USER_PW),,$(error PLASMACTL_ARTIFACT_REPOSITORY_USER_PW is not set: You need to pass it as make command argument))
-ifeq ($(shell awk -F= '/^ID=/ { if ($$2 == "alpine") print 1; else print 0 }' /etc/os-release),1)
-	apk update && apk add curl
-endif
 	$(eval ARTIFACT_BINARIES = $(shell ls plasmactl_*))
 	$(if $(ARTIFACT_BINARIES),,$(error No artifact binary file found in current directory (plasmactl_*)))
 	@$(foreach ARTIFACT_BINARY,$(ARTIFACT_BINARIES), \
