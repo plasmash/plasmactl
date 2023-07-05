@@ -34,10 +34,10 @@ build:
 	@echo "- Action: build"
 	@$(foreach SYSTEM_OS,$(ALL_SYSTEM_OS), \
 		$(foreach SYSTEM_PROCESSOR,$(ALL_SYSTEM_PROCESSORS), \
-			echo "${SYSTEM_OS}_${SYSTEM_PROCESSOR}" ; \
+			echo "Compiling artifact ${SYSTEM_OS}_${SYSTEM_PROCESSOR}..." ; \
+			GOOS=${SYSTEM_OS} GOARCH=${SYSTEM_PROCESSOR} ./${BINARY_NAME} build -p github.com/launchrctl/compose -n plasmactl # Does it provide .exe extension ? ; \
 		) \
 	)
-	#GOOS=${SYSTEM_OS} GOARCH=${SYSTEM_PROCESSOR} ./${BINARY_NAME} build -p github.com/launchrctl/compose -n plasmactl # Does it provide .exe extension ? ; \
 
 
 .PHONY: push
