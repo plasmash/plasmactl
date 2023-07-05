@@ -26,7 +26,7 @@ stages:
 push:
   stage: main
   before_script:
-    - apt-get update && apt-get install openssl make curl
+    - DEBIAN_FRONTEND='noninteractive' apt-get update && DEBIAN_FRONTEND='noninteractive' apt-get install openssl make curl
   script:
     - PLASMACTL_ARTIFACT_REPOSITORY_USER_PW_TMP="$(echo "${PLASMACTL_ARTIFACT_REPOSITORY_USER_PW_BASE64}" | base64 -d)"
     - make all PLASMACTL_ARTIFACT_REPOSITORY_USER_PW='${PLASMACTL_ARTIFACT_REPOSITORY_USER_PW_TMP}'
