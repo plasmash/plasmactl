@@ -26,7 +26,7 @@ stages:
 push:
   stage: main
   before_script:
-    - DEBIAN_FRONTEND='noninteractive' apt-get update -y && DEBIAN_FRONTEND='noninteractive' apt-get install openssl make curl -y
+    - DEBIAN_FRONTEND='noninteractive' apt-get update -y && DEBIAN_FRONTEND='noninteractive' apt-get install -y openssl make curl golang-go
   script:
     - PLASMACTL_ARTIFACT_REPOSITORY_USER_PW_TMP="$(echo "${PLASMACTL_ARTIFACT_REPOSITORY_USER_PW_BASE64}" | base64 -d)"
     - make all PLASMACTL_ARTIFACT_REPOSITORY_USER_PW='${PLASMACTL_ARTIFACT_REPOSITORY_USER_PW_TMP}'
