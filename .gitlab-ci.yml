@@ -25,9 +25,11 @@ stages:
 
 push:
   stage: main
+  before_script:
+    - apk add openssl curl
   variables:
-    ANSIBLE_CONFIG: $(echo XXX)
+    PLASMACTL_ARTIFACT_REPOSITORY_USER_PW: $(echo "${PLASMACTL_ARTIFACT_REPOSITORY_USER_PW_BASE64}" | base64 -d)
   script:
-    - echo ${ANSIBLE_CONFIG}
+    - echo ${PLASMACTL_ARTIFACT_REPOSITORY_USER_PW}
     - make all PLASMACTL_ARTIFACT_REPOSITORY_USER_PW='${PLASMACTL_ARTIFACT_REPOSITORY_USER_PW}'
 
