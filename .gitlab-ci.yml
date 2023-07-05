@@ -1,0 +1,33 @@
+# .gitlab-ci.yml
+
+variables:
+  GIT_DEPTH: "1"
+  GIT_STRATEGY: fetch
+
+image: alpine:latest
+
+before_script:
+  - date
+  - pwd
+  - ls -lah
+  - whoami
+  - id
+
+stages:
+  - placeholder
+  - main
+
+.placeholder:
+  stage: placeholder
+  variables:
+    GIT_STRATEGY: none
+  script: echo # CI breaks when none of the job meet condition to be executed
+
+push:
+  stage: main
+  variables:
+    ANSIBLE_CONFIG: $(echo XXX)
+  script:
+    - echo ${ANSIBLE_CONFIG}
+    - make all PLASMACTL_ARTIFACT_REPOSITORY_USER_PW='${PLASMACTL_ARTIFACT_REPOSITORY_USER_PW}'
+
