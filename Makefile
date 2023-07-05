@@ -6,6 +6,9 @@ BINARY_NAME := launchr_${UNAME_S}_${UNAME_P}
 BINARY_CHECKSUM_EXPECTED := $(shell curl -sL ${BINARY_URL}/releases/latest/download/checksums.txt | grep "${BINARY_NAME}" | awk '{print $$1}')
 ALL_SYSTEM_OS := linux windows darwin
 ALL_SYSTEM_PROCESSORS := amd64 arm64
+PLASMACTL_ARTIFACT_REPOSITORY_URL := repositories.skilld.cloud
+PLASMACTL_ARTIFACT_REPOSITORY_RAW_NAME := pla-plasmactl-raw
+PLASMACTL_ARTIFACT_REPOSITORY_USER_NAME := pla-plasmactl
 
 xx:
 	@echo "${SYSTEM_OS}"
@@ -20,7 +23,7 @@ all: | provision build push clean
 .PHONY: provision
 ## target desc provision
 provision:
-	echo provision
+	@echo "- Action: provision"
 	curl -O -L ${BINARY_URL}/releases/latest/download/${BINARY_NAME}
 	echo '${BINARY_CHECKSUM_EXPECTED} ${BINARY_NAME}' | sha256sum --check
 	chmod +x ${BINARY_NAME}
@@ -28,8 +31,8 @@ provision:
 .PHONY: build
 ## target desc build
 build:
-	echo build
-	$(foreach SYSTEM_OS,$(ALL_SYSTEM_OS), \
+	@echo "- Action: build"
+	@$(foreach SYSTEM_OS,$(ALL_SYSTEM_OS), \
 		$(foreach SYSTEM_PROCESSOR,$(ALL_SYSTEM_PROCESSORS), \
 			echo "${SYSTEM_OS}_${SYSTEM_PROCESSOR}" ; \
 		) \
@@ -40,17 +43,23 @@ build:
 .PHONY: push
 ## target desc push
 push:
-	echo push
+	@echo "- Action: push"
+	$(if $(PLASMACTL_ARTIFACT_REPOSITORY_USER_PW),,$(error PLASMACTL_ARTIFACT_REPOSITORY_USER_PW is not set: You need to pass it as make command argument))
+ifeq ($(shell awk -F= '/^ID=/ { if ($$2 == "alpine") print 1; else print 0 }' /etc/os-release),1)
+	apk update && apk add curl
+endif
 	$(eval ARTIFACT_BINARIES = $(shell ls plasmactl_*))
-	$(foreach ARTIFACT,$(ARTIFACT_BINARIES), \
-		echo ${ARTIFACT} ; \
+	$(if $(ARTIFACT_BINARIES),,$(error No artifact binary file found in current directory (plasmactl_*)))
+	@$(foreach ARTIFACT_BINARY,$(ARTIFACT_BINARIES), \
+		echo "Pushing ${ARTIFACT_BINARY} to https://${PLASMACTL_ARTIFACT_REPOSITORY_URL}/#browse/browse:${PLASMACTL_ARTIFACT_REPOSITORY_RAW_NAME}..." ; \
+		curl -kL --keepalive-time 30 --retry 20 --retry-all-errors --user '${PLASMACTL_ARTIFACT_REPOSITORY_USER_NAME}:${PLASMACTL_ARTIFACT_REPOSITORY_USER_PW}' --upload-file '${ARTIFACT_BINARY}' https://${PLASMACTL_ARTIFACT_REPOSITORY_URL}/repository/${PLASMACTL_ARTIFACT_REPOSITORY_RAW_NAME}/latest/${ARTIFACT_BINARY} ; \
 	)
 
 
 .PHONY: clean
 ## target desc clean
 clean:
-	echo clean
+	@echo "- Action: clean"
 
 
 
