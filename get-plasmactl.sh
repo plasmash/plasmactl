@@ -83,4 +83,9 @@ fi
 # Set execute permission on the downloaded file
 filename=$(basename "$url")
 chmod +x "$filename"
+echo
+./"$filename" --help
+echo
+./"$filename" --version
+echo
 
