@@ -2,7 +2,11 @@ include helpers/*.mk
 
 BINARY_REPO := github.com/launchrctl/launchr
 BINARY_URL := https://${BINARY_REPO}
+ifeq ($(UNAME_P),unknown)
+BINARY_NAME := launchr_${UNAME_S}_x86_64
+else
 BINARY_NAME := launchr_${UNAME_S}_${UNAME_P}
+endif
 BINARY_CHECKSUM_EXPECTED := $(shell curl -sL ${BINARY_URL}/releases/latest/download/checksums.txt | grep "${BINARY_NAME}" | awk '{print $$1}')
 ALL_SYSTEM_OS := darwin linux windows
 ALL_SYSTEM_PROCESSORS := amd64 arm64
@@ -11,9 +15,6 @@ PLASMACTL_ARTIFACT_REPOSITORY_RAW_NAME := pla-plasmactl-raw
 PLASMACTL_ARTIFACT_REPOSITORY_USER_NAME := pla-plasmactl
 PLASMACTL_BINARY_NAME := plasmactl_${UNAME_S}_${UNAME_P}
 
-ifeq ($(UNAME_P),unknown)
-UNAME_P = x86_64
-endif
 
 
 xx:
@@ -24,7 +25,7 @@ xx:
 
 
 .PHONY: all
-all: | provision build push clean
+all: | xx provision build push clean
 
 .PHONY: provision
 ## target desc provision
