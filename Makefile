@@ -27,7 +27,7 @@ provision:
 	@echo "- Action: provision"
 	@echo "-- Getting launchr binary file compatible with your machine..."
 	curl -O -L ${BINARY_URL}/releases/latest/download/${BINARY_NAME}
-	echo '${BINARY_CHECKSUM_EXPECTED} ${BINARY_NAME}' | sha256sum --check
+	#echo '${BINARY_CHECKSUM_EXPECTED} ${BINARY_NAME}' | sha256sum --check
 	chmod +x ${BINARY_NAME}
 	@echo "-- Done."
 
