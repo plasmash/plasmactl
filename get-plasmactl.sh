@@ -9,6 +9,17 @@ arch=$(uname -m)
 # Define the URL pattern for the file
 url="https://repositories.skilld.cloud/repository/pla-plasmactl-raw/latest/plasmactl_%s_%s"
 
+# Function to validate the credentials and return HTTP status code
+validate_credentials() {
+  local username="$1"
+  local password="$2"
+  local url="$3"
+
+  # Perform the credential validation by making a curl request and retrieving the HTTP status code
+  http_code=$(curl -s -o /dev/null -w "%{http_code}" -u "$username:$password" "$url")
+  echo "$http_code"
+}
+
 # Determine the appropriate values for 'os' and 'arch'
 case $os in
   Linux*)
@@ -47,6 +58,18 @@ read -p "Username: " username
 read -s -p "Password: " password
 echo
 
+# Check the validity of the credentials
+http_code=$(validate_credentials "$username" "$password" "$url")
+if [ -z "$http_code" ]; then
+  echo "Failed to validate credentials. Access denied."
+  exit 1
+elif [ "$http_code" -eq 200 ]; then
+  echo "Valid credentials. Access granted."
+else
+  echo "Invalid credentials. Access denied. (HTTP $http_code)"
+  exit 1
+fi
+
 # Download the file using curl or wget with Basic Auth header
 if command -v curl >/dev/null 2>&1; then
   curl -u "$username:$password" -O "$url"
@@ -56,4 +79,8 @@ else
   echo "Neither curl nor wget found. Please install one of them."
   exit 1
 fi
+
+# Set execute permission on the downloaded file
+filename=$(basename "$url")
+chmod +x "$filename"
 
