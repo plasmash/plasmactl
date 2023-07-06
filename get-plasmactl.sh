@@ -53,10 +53,16 @@ esac
 # Format the URL with the determined 'os' and 'arch' values
 url=$(printf "$url" "$os" "$arch")
 
-# Prompt user for username and password
-read -p "Username: " username
-read -s -p "Password: " password
-echo
+# Check if username and password are passed as script arguments
+if [ $# -eq 2 ]; then
+  username="$1"
+  password="$2"
+else
+  # Prompt user for username and password
+  read -p "Username: " username
+  read -s -p "Password: " password
+  echo
+fi
 
 # Check the validity of the credentials
 http_code=$(validate_credentials "$username" "$password" "$url")
