@@ -32,6 +32,7 @@ provision:
 	@echo "- Action: provision"
 	@echo "-- Getting launchr binary file compatible with your machine..."
 	curl -O -L ${BINARY_URL}/releases/latest/download/${BINARY_NAME}
+	@echo "-- Comparing checksums..."
 	echo '${BINARY_CHECKSUM_EXPECTED} ${BINARY_NAME}' | sha256sum --check
 	chmod +x ${BINARY_NAME}
 	@echo "-- Done."
@@ -41,7 +42,7 @@ provision:
 ## Build plasmactl (launchr + plugins) binaries compatible with multiple OS & Arch
 build:
 	@echo "- Action: build"
-	@echo "-- Building plasmactl (launchr + plugins) binaries compatible with all OS & Arch..."
+	@echo "-- Building plasmactl (launchr + plugins) binaries compatible with multiple OS & Arch..."
 	$(foreach SYSTEM_OS,$(ALL_SYSTEM_OS), \
 		$(foreach SYSTEM_PROCESSOR,$(ALL_SYSTEM_PROCESSORS), \
 			echo "Compiling artifact plasmactl_${SYSTEM_OS}_${SYSTEM_PROCESSOR}..." ; \
