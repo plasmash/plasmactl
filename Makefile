@@ -9,6 +9,7 @@ ALL_SYSTEM_PROCESSORS := amd64 arm64
 PLASMACTL_ARTIFACT_REPOSITORY_URL := repositories.skilld.cloud
 PLASMACTL_ARTIFACT_REPOSITORY_RAW_NAME := pla-plasmactl-raw
 PLASMACTL_ARTIFACT_REPOSITORY_USER_NAME := pla-plasmactl
+PLASMACTL_BINARY_NAME := plasmactl_${UNAME_S}_${UNAME_P}
 
 xx:
 	@echo "${SYSTEM_OS}"
@@ -34,10 +35,11 @@ build:
 	@echo "- Action: build"
 	@$(foreach SYSTEM_OS,$(ALL_SYSTEM_OS), \
 		$(foreach SYSTEM_PROCESSOR,$(ALL_SYSTEM_PROCESSORS), \
-			echo "Compiling artifact ${SYSTEM_OS}_${SYSTEM_PROCESSOR}..." ; \
-			GOOS=${SYSTEM_OS} GOARCH=${SYSTEM_PROCESSOR} ./${BINARY_NAME} build -p github.com/launchrctl/compose -n plasmactl # Does it provide .exe extension ? ; \
+			echo "Compiling artifact plasmactl_${SYSTEM_OS}_${SYSTEM_PROCESSOR}..." ; \
+			GOOS=${SYSTEM_OS} GOARCH=${SYSTEM_PROCESSOR} ./${BINARY_NAME} build -p github.com/launchrctl/compose -n plasmactl -o plasmactl_${SYSTEM_OS}_${SYSTEM_PROCESSOR} # Does it provide .exe extension ? ; \
 		) \
 	)
+	echo XXXX
 
 
 .PHONY: push
