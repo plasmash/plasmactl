@@ -11,6 +11,11 @@ PLASMACTL_ARTIFACT_REPOSITORY_RAW_NAME := pla-plasmactl-raw
 PLASMACTL_ARTIFACT_REPOSITORY_USER_NAME := pla-plasmactl
 PLASMACTL_BINARY_NAME := plasmactl_${UNAME_S}_${UNAME_P}
 
+ifeq ($(UNAME_P),unknown)
+UNAME_P = x86_64
+endif
+
+
 xx:
 	@echo "${SYSTEM_OS}"
 	@echo "${SYSTEM_PROCESSOR}"
