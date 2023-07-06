@@ -26,7 +26,7 @@ stages:
 push:
   stage: main
   variables:
-    - DEBIAN_FRONTEND: 'noninteractive'
+    DEBIAN_FRONTEND: 'noninteractive'
   before_script:
     - export
     - apt-get update -y && apt-get install -y openssl make curl git golang-go
