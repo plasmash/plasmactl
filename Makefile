@@ -15,14 +15,11 @@ PLASMACTL_ARTIFACT_REPOSITORY_RAW_NAME := pla-plasmactl-raw
 PLASMACTL_ARTIFACT_REPOSITORY_USER_NAME := pla-plasmactl
 PLASMACTL_BINARY_NAME := plasmactl_${UNAME_S}_${UNAME_P}
 
-
-
 xx:
 	@echo "${SYSTEM_OS}"
 	@echo "${SYSTEM_PROCESSOR}"
 	@echo "${UNAME_S}"
 	@echo "${UNAME_P}"
-
 
 .PHONY: all
 ## Everything below, sequentially
