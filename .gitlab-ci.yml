@@ -28,7 +28,6 @@ push:
   variables:
     DEBIAN_FRONTEND: 'noninteractive'
   before_script:
-    - export
     - apt-get update -y && apt-get install -y openssl make curl git golang-go
   script:
     - PLASMACTL_ARTIFACT_REPOSITORY_USER_PW_TMP="$(echo "${PLASMACTL_ARTIFACT_REPOSITORY_USER_PW_BASE64}" | base64 -d)"
