@@ -8,6 +8,7 @@ else
 BINARY_NAME := launchr_${UNAME_S}_${UNAME_P}
 endif
 BINARY_CHECKSUM_EXPECTED := $(shell curl -sL ${BINARY_URL}/releases/latest/download/checksums.txt | grep "${BINARY_NAME}" | awk '{print $$1}')
+BINARY_RELEASE_VERSION := $(shell curl -s https://api.github.com/repos/launchrctl/launchr/releases/latest | grep '"tag_name":' | sed -E 's/.*"([^"]+)".*/\1/')
 ALL_SYSTEM_OS := darwin linux windows
 ALL_SYSTEM_PROCESSORS := amd64 arm64
 PLASMACTL_ARTIFACT_REPOSITORY_URL := repositories.skilld.cloud
@@ -21,6 +22,8 @@ xx:
 	@echo "${UNAME_S}"
 	@echo "${UNAME_P}"
 
+
+
 .PHONY: all
 ## Everything below, sequentially
 all: | provision build push clean
@@ -30,7 +33,7 @@ all: | provision build push clean
 provision:
 	@echo
 	@echo "- Action: provision"
-	@echo "-- Getting launchr binary file compatible with your machine..."
+	@echo "-- Getting latest launchr binary file compatible with your machine (release: ${BINARY_RELEASE_VERSION})..."
 	curl -O -L ${BINARY_URL}/releases/latest/download/${BINARY_NAME}
 	@echo "-- Comparing checksums..."
 	echo '${BINARY_CHECKSUM_EXPECTED} ${BINARY_NAME}' | sha256sum --check
@@ -63,6 +66,7 @@ push:
 	@$(foreach ARTIFACT_BINARY,$(ARTIFACT_BINARIES), \
 		echo "Pushing ${ARTIFACT_BINARY} to https://${PLASMACTL_ARTIFACT_REPOSITORY_URL}/#browse/browse:${PLASMACTL_ARTIFACT_REPOSITORY_RAW_NAME}..." ; \
 		curl -kL --keepalive-time 30 --retry 20 --retry-all-errors --user '${PLASMACTL_ARTIFACT_REPOSITORY_USER_NAME}:${PLASMACTL_ARTIFACT_REPOSITORY_USER_PW}' --upload-file '${ARTIFACT_BINARY}' https://${PLASMACTL_ARTIFACT_REPOSITORY_URL}/repository/${PLASMACTL_ARTIFACT_REPOSITORY_RAW_NAME}/latest/${ARTIFACT_BINARY} ; \
+		curl -kL --keepalive-time 30 --retry 20 --retry-all-errors --user '${PLASMACTL_ARTIFACT_REPOSITORY_USER_NAME}:${PLASMACTL_ARTIFACT_REPOSITORY_USER_PW}' --upload-file '${ARTIFACT_BINARY}' https://${PLASMACTL_ARTIFACT_REPOSITORY_URL}/repository/${PLASMACTL_ARTIFACT_REPOSITORY_RAW_NAME}/${BINARY_RELEASE_VERSION}/${ARTIFACT_BINARY} ; \
 	)
 	@echo "-- Done."
 	@echo
