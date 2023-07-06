@@ -4,7 +4,7 @@ variables:
   GIT_DEPTH: "1"
   GIT_STRATEGY: fetch
 
-image: ubuntu:latest
+image: golang:latest
 
 before_script:
   - date
