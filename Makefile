@@ -24,6 +24,16 @@ xx:
 	echo "Argument value: $(PLASMACTL_ARTIFACT_REPOSITORY_USER_PW)"
 
 
+# If the 1st argument is "split"...
+ifeq (split,$(firstword $(MAKECMDGOALS)))
+# use the 2nd string as argument
+ARGS := $(wordlist 2,$(words $(MAKECMDGOALS)),$(MAKECMDGOALS))
+endif
+
+split:
+	$($@,$(MAKECMDGOALS))
+	@echo "YAY $(ARGS)"
+
 
 
 .PHONY: all
