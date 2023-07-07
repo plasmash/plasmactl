@@ -21,24 +21,10 @@ xx:
 	@echo "${SYSTEM_PROCESSOR}"
 	@echo "${UNAME_S}"
 	@echo "${UNAME_P}"
-	echo "Argument value: $(PLASMACTL_ARTIFACT_REPOSITORY_USER_PW)"
-
-
-# If the 1st argument is "split"...
-ifeq (split,$(firstword $(MAKECMDGOALS)))
-# use the 2nd string as argument
-ARGS := $(wordlist 2,$(words $(MAKECMDGOALS)),$(MAKECMDGOALS))
-endif
-
-split:
-	$($@,$(MAKECMDGOALS))
-	@echo "YAY $(ARGS)"
-
-
 
 .PHONY: all
 ## Everything below, sequentially
-all: | xx provision build push clean
+all: | provision build push clean
 
 .PHONY: provision
 ## Download launchr binary corresponding to current OS & Arch
