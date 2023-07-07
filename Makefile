@@ -51,7 +51,7 @@ build:
 		) \
 	)
 	@echo "-- Artifacts generated:"
-	@$(foreach file, $(wildcard plasmactl_*), echo "$(file)";)
+	@$(foreach file, "$(wildcard plasmactl_*)", echo "$(file)\n";)
 	@echo "-- Done."
 	@echo
 
@@ -68,4 +68,7 @@ push:
 	)
 	@echo "-- Done."
 	@echo
+
+x:
+	@$(foreach file, "$(wildcard plasmactl_*)", echo "$(file)\n";)
 
