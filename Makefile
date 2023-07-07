@@ -21,12 +21,13 @@ xx:
 	@echo "${SYSTEM_PROCESSOR}"
 	@echo "${UNAME_S}"
 	@echo "${UNAME_P}"
+	@echo "${PLASMACTL_ARTIFACT_REPOSITORY_USER_PW}"
 
 
 
 .PHONY: all
 ## Everything below, sequentially
-all: | provision build push clean
+all: | xx provision build push clean
 
 .PHONY: provision
 ## Download launchr binary corresponding to current OS & Arch
