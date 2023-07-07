@@ -1,5 +1,4 @@
 include helpers/*.mk
-SHELL := /bin/sh
 BINARY_REPO := github.com/launchrctl/launchr
 BINARY_URL := https://${BINARY_REPO}
 ifeq ($(UNAME_P),unknown)
@@ -51,7 +50,7 @@ build:
 		) \
 	)
 	@echo "-- Artifacts generated:"
-	@$(foreach file, $(wildcard plasmactl_*), printf "%s\n" "$(file)";)
+	$(shell ls -lah)
 	@echo "-- Done."
 	@echo
 
@@ -70,6 +69,6 @@ push:
 	@echo
 
 x:
-	@$(foreach file, $(wildcard plasmactl_*), printf "%s\n" "$(file)";)
+	$(shell ls -lah)
 
 
