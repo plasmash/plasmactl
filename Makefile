@@ -21,7 +21,8 @@ xx:
 	@echo "${SYSTEM_PROCESSOR}"
 	@echo "${UNAME_S}"
 	@echo "${UNAME_P}"
-	@echo "${PLASMACTL_ARTIFACT_REPOSITORY_USER_PW}"
+	echo "Argument value: $(PLASMACTL_ARTIFACT_REPOSITORY_USER_PW)"
+
 
 
 
@@ -34,7 +35,7 @@ all: | xx provision build push clean
 provision:
 	@echo
 	@echo "- Action: provision"
-	@echo "-- Getting latest launchr binary file compatible with your machine (release: ${BINARY_RELEASE_VERSION})..."
+	@echo "-- Getting latest launchr binary file (release: ${BINARY_RELEASE_VERSION}) compatible with your OS & Arch..."
 	curl -O -L ${BINARY_URL}/releases/latest/download/${BINARY_NAME}
 	@echo "-- Comparing checksums..."
 	echo '${BINARY_CHECKSUM_EXPECTED} ${BINARY_NAME}' | sha256sum --check
