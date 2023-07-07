@@ -1,5 +1,5 @@
 include helpers/*.mk
-
+SHELL := /bin/sh
 BINARY_REPO := github.com/launchrctl/launchr
 BINARY_URL := https://${BINARY_REPO}
 ifeq ($(UNAME_P),unknown)
