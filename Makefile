@@ -50,7 +50,7 @@ build:
 		) \
 	)
 	@echo "-- Artifacts generated:"
-	$(shell ls -lah)
+	ls -lah | grep plasmactl_
 	@echo "-- Done."
 	@echo
 
@@ -69,6 +69,6 @@ push:
 	@echo
 
 x:
-	$(shell ls -lah)
+	ls -lah | grep plasmactl_
 
 
