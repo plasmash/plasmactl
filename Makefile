@@ -50,6 +50,8 @@ build:
 			GOOS=${SYSTEM_OS} GOARCH=${SYSTEM_PROCESSOR} ./${BINARY_NAME} build -p github.com/launchrctl/compose -n plasmactl -o plasmactl_${SYSTEM_OS}_${SYSTEM_PROCESSOR} ; \
 		) \
 	)
+	@echo "-- Artifacts generated:"
+	@$(foreach file, $(wildcard plasmactl_*), echo $(file);)
 	@echo "-- Done."
 	@echo
 
@@ -59,24 +61,11 @@ push:
 	@echo "- Action: push"
 	@echo "-- Pushing platmactl binaries online..."
 	$(if $(PLASMACTL_ARTIFACT_REPOSITORY_USER_PW),,$(error PLASMACTL_ARTIFACT_REPOSITORY_USER_PW is not set: You need to pass it as make command argument))
-	$(eval ARTIFACT_BINARIES = $(shell ls plasmactl_*))
-	$(if $(ARTIFACT_BINARIES),,$(error No artifact binary file found in current directory (plasmactl_*)))
-	@$(foreach ARTIFACT_BINARY,$(ARTIFACT_BINARIES), \
-		echo "Pushing ${ARTIFACT_BINARY} to https://${PLASMACTL_ARTIFACT_REPOSITORY_URL}/#browse/browse:${PLASMACTL_ARTIFACT_REPOSITORY_RAW_NAME}..." ; \
-		curl -kL --keepalive-time 30 --retry 20 --retry-all-errors --user '${PLASMACTL_ARTIFACT_REPOSITORY_USER_NAME}:${PLASMACTL_ARTIFACT_REPOSITORY_USER_PW}' --upload-file '${ARTIFACT_BINARY}' https://${PLASMACTL_ARTIFACT_REPOSITORY_URL}/repository/${PLASMACTL_ARTIFACT_REPOSITORY_RAW_NAME}/latest/${ARTIFACT_BINARY} ; \
-		curl -kL --keepalive-time 30 --retry 20 --retry-all-errors --user '${PLASMACTL_ARTIFACT_REPOSITORY_USER_NAME}:${PLASMACTL_ARTIFACT_REPOSITORY_USER_PW}' --upload-file '${ARTIFACT_BINARY}' https://${PLASMACTL_ARTIFACT_REPOSITORY_URL}/repository/${PLASMACTL_ARTIFACT_REPOSITORY_RAW_NAME}/${BINARY_RELEASE_VERSION}/${ARTIFACT_BINARY} ; \
+	echo "Pushing ${ARTIFACT_BINARY} to https://${PLASMACTL_ARTIFACT_REPOSITORY_URL}/#browse/browse:${PLASMACTL_ARTIFACT_REPOSITORY_RAW_NAME}..." ; \
+	$(foreach ARTIFACT_BINARY, $(wildcard plasmactl_*), \
+		curl -kL --keepalive-time 30 --retry 20 --retry-all-errors --user '${PLASMACTL_ARTIFACT_REPOSITORY_USER_NAME}:${PLASMACTL_ARTIFACT_REPOSITORY_USER_PW}' --upload-file '${ARTIFACT_BINARY}' https://${PLASMACTL_ARTIFACT_REPOSITORY_URL}/repository/${PLASMACTL_ARTIFACT_REPOSITORY_RAW_NAME}/latest/${ARTIFACT_BINARY} >/dev/null 2>&1 ; \
+		curl -kL --keepalive-time 30 --retry 20 --retry-all-errors --user '${PLASMACTL_ARTIFACT_REPOSITORY_USER_NAME}:${PLASMACTL_ARTIFACT_REPOSITORY_USER_PW}' --upload-file '${ARTIFACT_BINARY}' https://${PLASMACTL_ARTIFACT_REPOSITORY_URL}/repository/${PLASMACTL_ARTIFACT_REPOSITORY_RAW_NAME}/${BINARY_RELEASE_VERSION}/${ARTIFACT_BINARY} >/dev/null 2>&1 ; \
 	)
 	@echo "-- Done."
 	@echo
-
-.PHONY: clean
-## Remove temp build files and generated artifacts
-clean:
-	@echo "- Action: clean"
-	@echo "-- Removing temp files and artifacts..."
-	$(shell ls -lah)
-	$(shell rm -rf launchr_* plasmactl_* build_*)
-	@echo "-- Done."
-	@echo
-
 
