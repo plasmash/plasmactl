@@ -83,23 +83,24 @@ if command -v curl >/dev/null 2>&1; then
 elif command -v wget >/dev/null 2>&1; then
   wget --user="$username" --password="$password" "$url"
 else
-  echo "Neither curl nor wget found. Please install one of them."
+  echo "Neither curl nor wget were found. Please install one of them."
   exit 1
 fi
 
 # Set execute permission on the downloaded file
-filename=$(basename "$url")
-if [ -e "$filename" ]; then
-  mv $filename plasmactl
-  filename="plasmactl"
-  chmod +x "$filename"
+tempfilename=$(basename "$url")
+finalfilename="plasmactl"
+if [ -e "$tempfilename" ]; then
+  echo "Renaming file $tempfilename to $finalfilename"
+  mv $tempfilename $finalfilename
+  chmod +x "$finalfilename"
   echo
-  ./"$filename" --help
+  ./"$finalfilename" --help
   echo
-  ./"$filename" --version
+  ./"$finalfilename" --version
   echo
 else
-    echo "File $filename does not exist"
+    echo "File $finalfilename does not exist"
     exit 1
 fi
 
