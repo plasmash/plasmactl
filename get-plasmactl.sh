@@ -92,7 +92,7 @@ fi
 
 # Set execute permission on the downloaded file
 tempfilename=$(basename "$url")
-finalfilename="plasmactl"
+finalfilename="plasmactl${extension}"
 if [ -e "$tempfilename" ]; then
   echo "Renaming file $tempfilename to $finalfilename"
   mv $tempfilename $finalfilename
