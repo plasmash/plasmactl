@@ -1,4 +1,5 @@
 #!/bin/sh
+#set -x
 
 # Get the operating system type
 os=$(uname -s)
@@ -26,7 +27,7 @@ case $os in
     os="linux"
     ;;
   Darwin*)
-    os="osx"
+    os="darwin"
     ;;
   CYGWIN*|MINGW32*|MSYS*|MINGW*)
     os="windows"
@@ -67,12 +68,12 @@ fi
 # Check the validity of the credentials
 http_code=$(validate_credentials "$username" "$password" "$url")
 if [ -z "$http_code" ]; then
-  echo "Failed to validate credentials. Access denied."
+  echo "Error: Failed to validate credentials. Access denied."
   exit 1
 elif [ "$http_code" -eq 200 ]; then
   echo "Valid credentials. Access granted."
 else
-  echo "Invalid credentials. Access denied. (HTTP $http_code)"
+  echo "Error: HTTP $http_code. Either credentials are invalid or file $filename does not exist."
   exit 1
 fi
 
@@ -88,10 +89,14 @@ fi
 
 # Set execute permission on the downloaded file
 filename=$(basename "$url")
-chmod +x "$filename"
-echo
-./"$filename" --help
-echo
-./"$filename" --version
-echo
-
+if [ -e "$filename" ]; then
+  chmod +x "$filename"
+  echo
+  ./"$filename" --help
+  echo
+  ./"$filename" --version
+  echo
+else
+    echo "File $filename does not exist"
+    exit 1
+fi
