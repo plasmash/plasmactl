@@ -8,7 +8,7 @@ os=$(uname -s)
 arch=$(uname -m)
 
 # Define the URL pattern for the file
-url="https://repositories.skilld.cloud/repository/pla-plasmactl-raw/latest/plasmactl_%s_%s"
+baseurl="https://repositories.skilld.cloud/repository/pla-plasmactl-raw/latest/plasmactl_%s_%s%s"
 
 # Function to validate the credentials and return HTTP status code
 validate_credentials() {
@@ -21,13 +21,15 @@ validate_credentials() {
   echo "$http_code"
 }
 
-# Determine the appropriate values for 'os' and 'arch'
+# Determine the appropriate values for 'os', 'arch' and 'extension'
 case $os in
   Linux*)
     os="linux"
+    extension=""
     ;;
   Darwin*)
     os="darwin"
+    extension=""
     ;;
   CYGWIN*|MINGW32*|MSYS*|MINGW*)
     os="windows"
@@ -52,8 +54,8 @@ case $arch in
     ;;
 esac
 
-# Format the URL with the determined 'os' and 'arch' values
-url=$(printf "$url" "$os" "$arch" "$extension")
+# Format the URL with the determined 'os', 'arch' and 'extension' values
+url=$(printf "$baseurl" "$os" "$arch" "$extension")
 
 # Check if username and password are passed as script arguments
 if [ $# -eq 2 ]; then
