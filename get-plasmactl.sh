@@ -1,11 +1,15 @@
 #!/bin/sh
 #set -x
+#
+echo "- Debug info:"
 
 # Get the operating system type
 os=$(uname -s)
+echo "os: ${os}"
 
 # Get the machine architecture
 arch=$(uname -m)
+echo "arch: ${arch}"
 
 # Define the URL pattern for the file
 baseurl="https://repositories.skilld.cloud/repository/pla-plasmactl-raw/latest/plasmactl_%s_%s%s"
@@ -56,6 +60,7 @@ esac
 
 # Format the URL with the determined 'os', 'arch' and 'extension' values
 url=$(printf "$baseurl" "$os" "$arch" "$extension")
+echo "url: ${url}"
 
 # Check if username and password are passed as script arguments
 if [ $# -eq 2 ]; then
