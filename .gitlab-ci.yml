@@ -23,7 +23,7 @@ stages:
     GIT_STRATEGY: none
   script: echo # CI breaks when none of the job meet condition to be executed
 
-push:
+push plasmactl artifacts:
   stage: main
   variables:
     DEBIAN_FRONTEND: 'noninteractive'
@@ -31,5 +31,18 @@ push:
     - apt-get update -y && apt-get install -y openssl make curl git golang-go
   script:
     - PLASMACTL_ARTIFACT_REPOSITORY_USER_PW_TMP="$(echo "${PLASMACTL_ARTIFACT_REPOSITORY_USER_PW_BASE64}" | base64 -d)"
-    - make all PLASMACTL_ARTIFACT_REPOSITORY_USER_PW="${PLASMACTL_ARTIFACT_REPOSITORY_USER_PW_TMP}"
+    - make binaries PLASMACTL_ARTIFACT_REPOSITORY_USER_PW="${PLASMACTL_ARTIFACT_REPOSITORY_USER_PW_TMP}"
+
+push get-plasmactl script:
+  stage: main
+  variables:
+    DEBIAN_FRONTEND: 'noninteractive'
+  before_script:
+    - apt-get update -y && apt-get install -y openssl make curl
+  script:
+    - PLASMACTL_ARTIFACT_REPOSITORY_USER_PW_TMP="$(echo "${PLASMACTL_ARTIFACT_REPOSITORY_USER_PW_BASE64}" | base64 -d)"
+    - make getplasmactl PLASMACTL_ARTIFACT_REPOSITORY_USER_PW="${PLASMACTL_ARTIFACT_REPOSITORY_USER_PW_TMP}"
+  only:
+    changes:
+      - get-plasmactl.sh
 
