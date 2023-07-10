@@ -90,6 +90,8 @@ fi
 # Set execute permission on the downloaded file
 filename=$(basename "$url")
 if [ -e "$filename" ]; then
+  mv $filename plasmactl
+  filename="plasmactl"
   chmod +x "$filename"
   echo
   ./"$filename" --help
