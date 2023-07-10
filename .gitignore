@@ -8,6 +8,8 @@ plasmactl_darwin_amd64
 plasmactl_darwin_arm64
 plasmactl_linux_amd64
 plasmactl_linux_arm64
-plasmactl_windows_amd64
-plasmactl_windows_arm64
+plasmactl_linux_386
+plasmactl_windows_amd64.exe
+plasmactl_windows_arm64.exe
+plasmactl_windows_386.exe
 build_*

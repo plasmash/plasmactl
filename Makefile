@@ -8,8 +8,8 @@ BINARY_NAME := launchr_${UNAME_S}_${UNAME_P}
 endif
 BINARY_CHECKSUM_EXPECTED := $(shell curl -sL ${BINARY_URL}/releases/latest/download/checksums.txt | grep "${BINARY_NAME}" | awk '{print $$1}')
 BINARY_RELEASE_VERSION := $(shell curl -s https://api.github.com/repos/launchrctl/launchr/releases/latest | grep '"tag_name":' | sed -E 's/.*"([^"]+)".*/\1/')
-ALL_SYSTEM_OS := darwin linux windows
-ALL_SYSTEM_PROCESSORS := amd64 arm64
+TARGET_OSES := darwin linux windows
+TARGET_ARCHES := amd64 arm64 386
 PLASMACTL_ARTIFACT_REPOSITORY_URL := repositories.skilld.cloud
 PLASMACTL_ARTIFACT_REPOSITORY_RAW_NAME := pla-plasmactl-raw
 PLASMACTL_ARTIFACT_REPOSITORY_USER_NAME := pla-plasmactl
@@ -43,11 +43,11 @@ provision:
 build:
 	@echo "- Action: build"
 	@echo "-- Building plasmactl (launchr + plugins) binaries compatible with multiple OS & Arch..."
-	$(foreach SYSTEM_OS,$(ALL_SYSTEM_OS), \
-		$(if $(filter windows,$(SYSTEM_OS)), $(eval EXTENSION := .exe)) \
-		$(foreach SYSTEM_PROCESSOR,$(ALL_SYSTEM_PROCESSORS), \
-			echo "Compiling artifact plasmactl_${SYSTEM_OS}_${SYSTEM_PROCESSOR}..." ; \
-			GOOS=${SYSTEM_OS} GOARCH=${SYSTEM_PROCESSOR} ./${BINARY_NAME} build -p github.com/launchrctl/compose -n plasmactl -o plasmactl_${SYSTEM_OS}_${SYSTEM_PROCESSOR}${EXTENSION} ; \
+	$(foreach TARGET_OS,$(TARGET_OSES), \
+		$(if $(filter windows,$(TARGET_OS)), $(eval EXTENSION := .exe)) \
+		$(foreach TARGET_ARCH,$(TARGET_ARCHES), \
+			echo "Compiling artifact plasmactl_${TARGET_OS}_${TARGET_ARCH}..." ; \
+			GOOS=${TARGET_OS} GOARCH=${TARGET_ARCH} ./${BINARY_NAME} build -p github.com/launchrctl/compose -n plasmactl -o plasmactl_${TARGET_OS}_${TARGET_ARCH}${EXTENSION} ; \
 		) \
 	)
 	@echo "-- Artifacts generated:"

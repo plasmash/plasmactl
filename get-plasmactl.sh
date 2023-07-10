@@ -52,6 +52,9 @@ case $arch in
   i?86|x86)
     arch="386"
     ;;
+  arm64|aarch64)
+    arch="arm64"
+    ;;
   *)
     echo "Unsupported architecture: $arch"
     exit 1
