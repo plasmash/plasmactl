@@ -74,10 +74,10 @@ push:
 ## Upload artifacts (plasmactl binaries) to an online raw repository
 getplasmactl:
 	@echo "- Action: push"
+	$(eval FILE_NAME = get-plasmactl.sh)
+	@test -f ${FILE_NAME} || (echo "Error: ${FILE_NAME} file not found in current directory" && exit 1)
 	@echo "-- Pushing get-plasmactl.sh to https://${PLASMACTL_ARTIFACT_REPOSITORY_URL}/#browse/browse:${PLASMACTL_ARTIFACT_REPOSITORY_RAW_NAME}..."
 	$(if $(PLASMACTL_ARTIFACT_REPOSITORY_USER_PW),,$(error PLASMACTL_ARTIFACT_REPOSITORY_USER_PW is not set: You need to pass it as make command argument))
-	$(eval FILE_NAME = get-plasmactl.sh)
-	$(if $(FILE_NAME),,$(error get-plasmactl.sh file not found in current directory))
 	@curl -kL --keepalive-time 30 --retry 20 --retry-all-errors --user '${PLASMACTL_ARTIFACT_REPOSITORY_USER_NAME}:${PLASMACTL_ARTIFACT_REPOSITORY_USER_PW}' --upload-file '${FILE_NAME}' https://${PLASMACTL_ARTIFACT_REPOSITORY_URL}/repository/${PLASMACTL_ARTIFACT_REPOSITORY_RAW_NAME}/${FILE_NAME} >/dev/null 2>&1
 	@echo "-- Done."
 	@echo
