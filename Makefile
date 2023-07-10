@@ -44,9 +44,10 @@ build:
 	@echo "- Action: build"
 	@echo "-- Building plasmactl (launchr + plugins) binaries compatible with multiple OS & Arch..."
 	$(foreach SYSTEM_OS,$(ALL_SYSTEM_OS), \
+		$(if $(filter windows,$(SYSTEM_OS)), $(eval EXTENSION := .exe)) \
 		$(foreach SYSTEM_PROCESSOR,$(ALL_SYSTEM_PROCESSORS), \
 			echo "Compiling artifact plasmactl_${SYSTEM_OS}_${SYSTEM_PROCESSOR}..." ; \
-			GOOS=${SYSTEM_OS} GOARCH=${SYSTEM_PROCESSOR} ./${BINARY_NAME} build -p github.com/launchrctl/compose -n plasmactl -o plasmactl_${SYSTEM_OS}_${SYSTEM_PROCESSOR} ; \
+			GOOS=${SYSTEM_OS} GOARCH=${SYSTEM_PROCESSOR} ./${BINARY_NAME} build -p github.com/launchrctl/compose -n plasmactl -o plasmactl_${SYSTEM_OS}_${SYSTEM_PROCESSOR}${EXTENSION} ; \
 		) \
 	)
 	@echo "-- Artifacts generated:"

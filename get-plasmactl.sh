@@ -31,6 +31,7 @@ case $os in
     ;;
   CYGWIN*|MINGW32*|MSYS*|MINGW*)
     os="windows"
+    extension=".exe"
     ;;
   *)
     echo "Unsupported operating system: $os"
@@ -52,7 +53,7 @@ case $arch in
 esac
 
 # Format the URL with the determined 'os' and 'arch' values
-url=$(printf "$url" "$os" "$arch")
+url=$(printf "$url" "$os" "$arch" "$extension")
 
 # Check if username and password are passed as script arguments
 if [ $# -eq 2 ]; then
