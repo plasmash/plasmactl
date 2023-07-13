@@ -12,10 +12,10 @@ arch=$(uname -m)
 baseurl="https://repositories.skilld.cloud/repository/pla-plasmactl-raw/latest/plasmactl_%s_%s%s"
 
 # Create a log file where every output will be piped to
-: "${INSTALL_LOG:=/tmp/get-plasmactl-$(date '+%Y%m%d-%H%M%S').log}"
+: "${LOG_FILE:=/tmp/get-plasmactl-$(date '+%Y%m%d-%H%M%S').log}"
 pipe=/tmp/get-plasmactl-$$.tmp
 mkfifo "$pipe"
-tee < "$pipe" "${INSTALL_LOG}" &
+tee < "$pipe" "${LOG_FILE}" &
 exec 1>&-
 exec 1>"$pipe" 2>&1
 trap 'rm -f "$pipe"' EXIT
@@ -63,7 +63,7 @@ exit_with_error() {
   output "- https://im.skilld.cloud/group/pla-plasmactl.client" "heading"
   output "- https://im.skilld.cloud/group/pla-plasmactl.prod" "heading"
   output ""
-  output "Log file: ${INSTALL_LOG}"
+  output "Log file: ${LOG_FILE}"
   output ""
   exit 1
 }
@@ -128,33 +128,6 @@ ${var}"
   done
 }
 
-intro() {
-  output "Starting plasmactl installation..." "success"
-}
-
-outro() {
-  output "plasmactl has been installed successfully." "success"
-
-  if command -v "${binaryname}" > /dev/null 2>&1; then
-    output ""
-    "${binaryname}" --version
-  fi
-
-  output ""
-  output "What's next?" "heading"
-  output "  To use the CLI, run: plasmactl" "output"
-  output ""
-  output "Useful links:" "heading"
-  output "  CLI introduction: https://projects.skilld.cloud/skilld/pla-plasmactl/-/blob/master/README.md"
-
-  if [ -n "$footer_notes" ]; then
-    output ""
-    output "Warning during installation:" "heading"
-    output "$footer_notes" "warning"
-  fi
-  output ""
-}
-
 # Function to validate the credentials and return HTTP status code
 validate_credentials() {
   local username="$1"
@@ -204,7 +177,7 @@ esac
 
 ## Logic starts here
 
-intro
+output "Starting plasmactl installation..." "success"
 
 # Format the URL with the determined 'os', 'arch' and 'extension' values
 url=$(printf "$baseurl" "$os" "$arch" "$extension")
@@ -237,7 +210,7 @@ fi
 
 # Download the file using curl or wget with Basic Auth header
 if command -v curl >/dev/null 2>&1; then
-  curl -u "$username:$password" -O "$url"
+  curl -sS -u "$username:$password" -O "$url"
 elif command -v wget >/dev/null 2>&1; then
   wget --user="$username" --password="$password" "$url"
 else
@@ -292,5 +265,20 @@ else
   fi
 fi
 
-outro
-
+output "plasmactl has been installed successfully." "success"
+if command -v "${binaryname}" > /dev/null 2>&1; then
+output ""
+"${binaryname}" --version
+fi
+output ""
+output "What's next?" "heading"
+output "  To use the CLI, run: plasmactl" "output"
+output ""
+output "Useful links:" "heading"
+output "  CLI introduction: https://projects.skilld.cloud/skilld/pla-plasmactl/-/blob/master/README.md"
+if [ -n "$footer_notes" ]; then
+output ""
+output "Warning during installation:" "heading"
+output "$footer_notes" "warning"
+fi
+output ""
