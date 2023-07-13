@@ -245,13 +245,13 @@ else
   if ! printf "%s" "$PATH" | grep "${dirpath}" > /dev/null; then
     output "${dirpath} is not in \$PATH." "warning"
     add_footer_note " ⚠ The directory \"${dirpath}/\" is not in \$PATH"
-    if printf "%s" "$SHELL" | grep '/bin/zsh' > /dev/null; then
+    if [ "$(basename $SHELL)" = "zsh" ]; then
       if ! grep "export PATH=\"${dirpath}:\$PATH\"" "$HOME/.zshrc" > /dev/null; then
         add_footer_note \
           "   Run this command to add the directory to your PATH:" \
           "   echo 'export PATH=\"${dirpath}:\$PATH\"' >> \$HOME/.zshrc && . \$HOME/.zshrc"
       fi
-    elif printf "%s" "$SHELL" | grep '/bin/bash' > /dev/null; then
+    elif [ "$(basename $SHELL)" = "bash" ]; then
       if ! grep "export PATH=\"${dirpath}:\$PATH\"" "$HOME/.bashrc" > /dev/null; then
         add_footer_note \
           "   Run this command to add the directory to your PATH:" \
@@ -265,6 +265,17 @@ else
   fi
 fi
 
+# Prepare commands autocompletion
+autocomplete_helper() {
+  if [ -n "$SHELL" ]; then
+    if [ "$(basename $SHELL)" = "bash" ] || [ "$(basename $SHELL)" = "fish" ] || [ "$(basename $SHELL)" = "powershell" ] || [ "$(basename $SHELL)" = "zsh" ]; then
+      completion_script_name=completion_script
+      output "  - Run this command to add autocompletion:"
+      echo "    \"${binaryname} completion $(basename $SHELL) > ${completion_script_name} && source ${completion_script_name} && rm ${completion_script_name}\""
+    fi
+  fi
+}
+# Outro
 output "plasmactl has been installed successfully." "success"
 if command -v "${binaryname}" > /dev/null 2>&1; then
 output ""
@@ -272,10 +283,11 @@ output ""
 fi
 output ""
 output "What's next?" "heading"
-output "  To use the CLI, run: plasmactl" "output"
+autocomplete_helper
+output "  - To use the CLI, run: plasmactl" "output"
 output ""
 output "Useful links:" "heading"
-output "  CLI introduction: https://projects.skilld.cloud/skilld/pla-plasmactl/-/blob/master/README.md"
+output "  - CLI introduction: https://projects.skilld.cloud/skilld/pla-plasmactl/-/blob/master/README.md"
 if [ -n "$footer_notes" ]; then
 output ""
 output "Warning during installation:" "heading"
