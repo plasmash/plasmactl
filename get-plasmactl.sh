@@ -231,8 +231,14 @@ mv "${tempbinaryname}" "${binaryname}"
 chmod +x "${binaryname}"
 
 # Installing binary
-dirpath="/usr/local/bin"
-if [ -n "${PATH+set}" ] && printf "%s" "$PATH" | grep "${dirpath}" > /dev/null; then # PATH is defined and includes dir where we can move binary
+if echo $PATH | grep "$HOME/.global/bin" > /dev/null; then
+  dirpath="$HOME/.global/bin"
+elif echo $PATH | grep "$HOME/.local/bin" > /dev/null; then
+  dirpath="$HOME/.local/bin"
+elif echo $PATH | grep "/usr/local/bin" > /dev/null; then
+  dirpath="/usr/local/bin"
+fi
+if [ -n "${dirpath}" ] && [ -n "${PATH+set}" ] && printf "%s" "$PATH" | grep "${dirpath}" > /dev/null; then # PATH is defined and includes dir where we can move binary
   output "Installing ${binaryname} binary under ${dirpath}"
   call_try_user "mv ${binaryname} ${dirpath}" "Failed to move ${binaryname} to ${dirpath}"
 else
