@@ -56,6 +56,7 @@ output() {
 }
 
 exit_with_error() {
+  if [ -e "${binaryname}" ]; then rm "${binaryname}"; fi
   output "Installation failed" "error"
   output ""
   output "Get help with your plasmactl setup:" "heading"
@@ -258,12 +259,11 @@ chmod +x "${binaryname}"
 
 # Installing binary
 dirpath="/usr/local/bin"
-if [ -n "${PATH+set}" ] && printf "%s" "$PATH" | grep "/usr/local/bin" > /dev/null; then # PATH is defined and includes dir where we can move binary
+if [ -n "${PATH+set}" ] && printf "%s" "$PATH" | grep "${dirpath}" > /dev/null; then # PATH is defined and includes dir where we can move binary
   output "Installing ${binaryname} binary under ${dirpath}"
-  #call_try_user "rm -f ${dirpath}/${binaryname}" "Failed to remove ${dirpath}/${binaryname}"
   call_try_user "mv ${binaryname} ${dirpath}" "Failed to move ${binaryname} to ${dirpath}"
 else
-  output "\$PATH is either undefined, empty or does not contain ${dirpath}"
+  output "\$PATH does not contain ${dirpath}" # PATH is either undefined, empty or does not contain ${dirpath}
   dirpath="$HOME/.plasmactl"
   if [ ! -d "${dirpath}" ]; then mkdir -p "${dirpath}" && output "Creating ${dirpath} directory"; fi
   output "Moving ${binaryname} to ${dirpath}"
