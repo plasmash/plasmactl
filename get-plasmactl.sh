@@ -25,7 +25,7 @@ has_sudo=""
 footer_notes=""
 
 
-function output {
+output() {
     style_start=""
     style_end=""
     if [ "${2:-}" != "" ]; then
@@ -57,7 +57,7 @@ function output {
 }
 
 
-function exit_with_error() {
+exit_with_error() {
     output "Installation failed" "error"
     output "\nGet help with your plasmactl setup:" "heading"
     output "- https://im.skilld.cloud/group/pla-plasmactl.client" "heading"
@@ -67,7 +67,7 @@ function exit_with_error() {
     exit 1
 }
 
-function init_sudo() {
+init_sudo() {
     if [ ! -z "${has_sudo}" ]; then
         return
     fi
@@ -87,7 +87,7 @@ function init_sudo() {
     fi
 }
 
-function call_root() {
+call_root() {
     init_sudo
 
     if ! ${has_sudo}; then
@@ -102,7 +102,7 @@ function call_root() {
     return 1
 }
 
-function call_try_user() {
+call_try_user() {
     if ! call_user "$1"; then
         output "Command failed, re-trying with sudo" "warning"
         if ! call_root "$1"; then
@@ -112,11 +112,11 @@ function call_try_user() {
     fi
 }
 
-function call_user() {
+call_user() {
     sh -c "$1" 2>&1
 }
 
-function add_footer_note() {
+add_footer_note() {
     for var in "$@"; do
         if [ ! -z "$footer_notes" ]; then
             footer_notes="${footer_notes}\n${var}"
@@ -126,11 +126,11 @@ function add_footer_note() {
     done
 }
 
-function intro() {
+intro() {
     output "Starting plasmactl installation..." "success"
 }
 
-function outro() {
+outro() {
     output "plasmactl has been installed successfully." "success"
 
     if command -v "${binaryname}" > /dev/null 2>&1; then
@@ -252,16 +252,18 @@ chmod +x "${binaryname}"
 
 # Installing binary
 dirpath="/usr/local/bin"
-if [ -n "${PATH+set}" ] && echo $PATH | grep "/usr/local/bin" > /dev/null; then # PATH is defined and includes dir where we can move binary
+if [ -n "${PATH+set}" ] && echo $PATH | grep "/usr/local/binXXX" > /dev/null; then # PATH is defined and includes dir where we can move binary
   echo "Installing ${binaryname} binary under ${dirpath}"
+  #call_try_user "rm -f ${dirpath}/${binaryname}" "Failed to remove ${dirpath}/${binaryname}"
   call_try_user "mv ${binaryname} ${dirpath}" "Failed to move ${binaryname} to ${dirpath}"
 else
   echo "\$PATH is either undefined, empty or does not contain ${dirpath}"
   dirpath="$HOME/.plasmactl"
-  if [ ! -d ${dirpath} ]; then mkdir -p ${dirpath}; fi
+  if [ ! -d ${dirpath} ]; then mkdir -p ${dirpath} && echo "Creating ${dirpath} directory"; fi
+  echo "Moving ${binaryname} to ${dirpath}"
   mv ${binaryname} ${dirpath}
 
-  if ! echo $PATH | grep "${dirpath}"; then
+  if ! echo $PATH | grep "${dirpath}" > /dev/null; then
     output "${dirpath} is not in \$PATH." "warning"
     add_footer_note " ⚠ The directory \"${dirpath}/\" is not in \$PATH"
     if echo $SHELL | grep '/bin/zsh' > /dev/null; then
