@@ -46,8 +46,8 @@ build:
 	$(foreach TARGET_OS,$(TARGET_OSES), \
 		$(if $(filter windows,$(TARGET_OS)), $(eval EXTENSION := .exe)) \
 		$(foreach TARGET_ARCH,$(TARGET_ARCHES), \
-			echo "Compiling artifact plasmactl_${TARGET_OS}_${TARGET_ARCH}..." ; \
-			GOOS=${TARGET_OS} GOARCH=${TARGET_ARCH} ./${BINARY_NAME} build -p github.com/launchrctl/compose -n plasmactl -o plasmactl_${TARGET_OS}_${TARGET_ARCH}${EXTENSION} ; \
+			echo "Compiling artifact plasmactl_${TARGET_OS}_${TARGET_ARCH}${EXTENSION}..." ; \
+			GOOS=${TARGET_OS} GOARCH=${TARGET_ARCH} ./${BINARY_NAME} build -p github.com/launchrctl/compose@latest -n plasmactl -o plasmactl_${TARGET_OS}_${TARGET_ARCH}${EXTENSION} ; \
 		) \
 	)
 	@echo "-- Artifacts generated:"
