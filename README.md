@@ -4,7 +4,7 @@
 
 ## What ?
 
-- [Launchrctl](https://github.com/launchrctl/launchr) + [plugins](https://github.com/launchrctl/compose) = **plasmactl**
+- [Launchrctl](https://github.com/launchrctl/launchr) + [plugins](https://github.com/launchrctl/) = **plasmactl**
 
 ## How ?
 
