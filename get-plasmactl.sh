@@ -86,7 +86,7 @@ init_sudo() {
     cmd_sudo='doas'
   elif command -v sudo > /dev/null 2>&1; then
     has_sudo=true
-    cmd_sudo='sudo -E'
+    cmd_sudo='sudo'
   fi
 }
 
