@@ -75,14 +75,16 @@ init_sudo() {
 
   has_sudo=false
   # Are we running the installer as root?
-  if [ "$(echo "$UID")" = "0" ]; then
+  if [ "$(id -u)" = "0" ]; then
     has_sudo=true
     cmd_sudo=''
-
     return
   fi
 
-  if command -v sudo > /dev/null 2>&1; then
+  if command -v doas > /dev/null 2>&1; then
+    has_sudo=true
+    cmd_sudo='doas'
+  elif command -v sudo > /dev/null 2>&1; then
     has_sudo=true
     cmd_sudo='sudo -E'
   fi
@@ -92,7 +94,7 @@ call_root() {
   init_sudo
 
   if ! "${has_sudo}"; then
-    output "sudo is required to perform this operation" "error"
+    output "doas or sudo is required to perform this operation" "error"
     exit_with_error
   fi
 
@@ -300,3 +302,4 @@ output "Warning during installation:" "heading"
 output "$footer_notes" "warning"
 fi
 output ""
+
