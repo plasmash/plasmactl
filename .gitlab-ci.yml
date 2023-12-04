@@ -32,11 +32,13 @@ push plasmactl artifacts:
     - apt-get update -y && apt-get install -y openssl make curl git golang-go
   script:
     - PLASMACTL_ARTIFACT_REPOSITORY_USER_PW_TMP="$(echo "${PLASMACTL_ARTIFACT_REPOSITORY_USER_PW_BASE64}" | base64 -d)"
+    - TARGET_VERSION="$(echo "${VERSION})"
     - |
       echo
       echo "##############################################################################################"
       echo "- Listing variables..."
       echo "VERSION=${VERSION}"
+      echo "TARGET_VERSION=${TARGET_VERSION}"
       echo "##############################################################################################"
     - make binaries PLASMACTL_ARTIFACT_REPOSITORY_USER_PW="${PLASMACTL_ARTIFACT_REPOSITORY_USER_PW_TMP}" TARGET_VERSION="${VERSION}"
 
@@ -49,7 +51,7 @@ push get-plasmactl script:
   script:
     - PLASMACTL_ARTIFACT_REPOSITORY_USER_PW_TMP="$(echo "${PLASMACTL_ARTIFACT_REPOSITORY_USER_PW_BASE64}" | base64 -d)"
     - make getplasmactl PLASMACTL_ARTIFACT_REPOSITORY_USER_PW="${PLASMACTL_ARTIFACT_REPOSITORY_USER_PW_TMP}"
-  #only:
-    #changes:
-      #- get-plasmactl.sh
+  only:
+    changes:
+      - get-plasmactl.sh
 
