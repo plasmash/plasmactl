@@ -49,7 +49,7 @@ push get-plasmactl script:
   script:
     - PLASMACTL_ARTIFACT_REPOSITORY_USER_PW_TMP="$(echo "${PLASMACTL_ARTIFACT_REPOSITORY_USER_PW_BASE64}" | base64 -d)"
     - make getplasmactl PLASMACTL_ARTIFACT_REPOSITORY_USER_PW="${PLASMACTL_ARTIFACT_REPOSITORY_USER_PW_TMP}"
-  only:
-    changes:
-      - get-plasmactl.sh
+  #only:
+    #changes:
+      #- get-plasmactl.sh
 
