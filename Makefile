@@ -22,7 +22,9 @@ xx:
 	@echo "${UNAME_S}"
 	@echo "${UNAME_P}"
 
-.PHONY: all
+.DEFAULT_GOAL := help
+
+.PHONY: binaries
 ## Everything below, sequentially
 binaries: | check provision build push clean
 
@@ -93,7 +95,7 @@ push:
 .PHONY: getplasmactl
 ## Upload artifacts (plasmactl binaries) to an online raw repository
 getplasmactl:
-	@echo "- Action: push"
+	@echo "- Action: getplasmactl"
 	$(eval FILE_NAME = get-plasmactl.sh)
 	@test -f ${FILE_NAME} || (echo "Error: ${FILE_NAME} file not found in current directory" && exit 1)
 	@echo "-- Pushing get-plasmactl.sh to https://${PLASMACTL_ARTIFACT_REPOSITORY_URL}/#browse/browse:${PLASMACTL_ARTIFACT_REPOSITORY_RAW_NAME}..."
