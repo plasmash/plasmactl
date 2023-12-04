@@ -28,11 +28,12 @@ push plasmactl artifacts:
   when: manual
   variables:
     DEBIAN_FRONTEND: 'noninteractive'
+    VERSION: 'v0.2.5' #TODO: Remove
   before_script:
     - apt-get update -y && apt-get install -y openssl make curl git golang-go
   script:
-    - PLASMACTL_ARTIFACT_REPOSITORY_USER_PW_TMP="$(echo "${PLASMACTL_ARTIFACT_REPOSITORY_USER_PW_BASE64}" | base64 -d)"
-    - TARGET_VERSION="$(echo "${VERSION}")"
+    - export PLASMACTL_ARTIFACT_REPOSITORY_USER_PW_TMP="$(echo "${PLASMACTL_ARTIFACT_REPOSITORY_USER_PW_BASE64}" | base64 -d)"
+    - export TARGET_VERSION="$(echo "${VERSION}")"
     - |
       echo
       echo "##############################################################################################"
