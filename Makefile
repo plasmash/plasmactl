@@ -17,10 +17,11 @@ PLASMACTL_ARTIFACT_REPOSITORY_USER_NAME := pla-plasmactl
 PLASMACTL_BINARY_NAME := plasmactl_${UNAME_S}_${UNAME_P}
 
 xx:
-	@echo "${SYSTEM_OS}"
-	@echo "${SYSTEM_PROCESSOR}"
-	@echo "${UNAME_S}"
-	@echo "${UNAME_P}"
+	@echo "SYSTEM_OS: ${SYSTEM_OS}"
+	@echo "SYSTEM_PROCESSOR: ${SYSTEM_PROCESSOR}"
+	@echo "UNAME_S: ${UNAME_S}"
+	@echo "UNAME_P: ${UNAME_P}"
+	@echo "TARGET_VERSION: $(TARGET_VERSION)"
 
 .DEFAULT_GOAL := help
 
@@ -35,9 +36,10 @@ check:
 	@echo
 	@echo "- Action: check"
 	# Check if the variable is empty or null
-	ifeq ($(strip $(TARGET_VERSION)),)
-	    $(error TARGET_VERSION is empty or null. Please set a value.)
-	endif
+	#ifeq ($(strip $(TARGET_VERSION)),)
+	    #$(error TARGET_VERSION is empty or null. Please set a value.)
+	#endif
+	#$(if $(TARGET_VERSION),,$(error TARGET_VERSION is not set: You need to pass it as make command argument))
 	# Check if TARGET_VERSION matches SemVer pattern
 	#ifeq ($(shell echo "$(TARGET_VERSION)" | grep -E '^[0-9]+\.[0-9]+\.[0-9]+$$'),) # Fails on '-rc'
 	ifeq ($(shell echo "$(TARGET_VERSION)" | grep -E '^v?[0-9]+\.[0-9]+\.[0-9]+.*$$'),) # Succeed on '-rc'
