@@ -26,7 +26,7 @@ xx:
 
 .PHONY: binaries
 ## Everything below, sequentially
-binaries: | check provision build push clean
+binaries: check provision build push clean
 
 
 .PHONY: check
@@ -34,15 +34,15 @@ binaries: | check provision build push clean
 check:
 	@echo
 	@echo "- Action: check"
-# Check if the variable is empty or null
-ifeq ($(strip $(TARGET_VERSION)),)
-    $(error TARGET_VERSION is empty or null. Please set a value.)
-endif
-# Check if TARGET_VERSION matches SemVer pattern
-#ifeq ($(shell echo "$(TARGET_VERSION)" | grep -E '^[0-9]+\.[0-9]+\.[0-9]+$$'),) # Fails on '-rc'
-ifeq ($(shell echo "$(TARGET_VERSION)" | grep -E '^v?[0-9]+\.[0-9]+\.[0-9]+.*$$'),) # Succeed on '-rc'
-    $(error TARGET_VERSION does not match the SemVer pattern. Please provide a valid version.)
-endif
+	# Check if the variable is empty or null
+	ifeq ($(strip $(TARGET_VERSION)),)
+	    $(error TARGET_VERSION is empty or null. Please set a value.)
+	endif
+	# Check if TARGET_VERSION matches SemVer pattern
+	#ifeq ($(shell echo "$(TARGET_VERSION)" | grep -E '^[0-9]+\.[0-9]+\.[0-9]+$$'),) # Fails on '-rc'
+	ifeq ($(shell echo "$(TARGET_VERSION)" | grep -E '^v?[0-9]+\.[0-9]+\.[0-9]+.*$$'),) # Succeed on '-rc'
+	    $(error TARGET_VERSION does not match the SemVer pattern. Please provide a valid version.)
+	endif
 	@echo "- Done."
 	@echo
 
@@ -77,7 +77,7 @@ build:
 	@echo
 
 .PHONY: push
-## Upload artifacts (plasmactl binaries) to an online raw repository
+## Upload plasmactl binaries artifacts to Nexus repository
 push:
 	@echo "- Action: push"
 	@echo "-- Pushing platmactl binaries to https://${PLASMACTL_ARTIFACT_REPOSITORY_URL}/#browse/browse:${PLASMACTL_ARTIFACT_REPOSITORY_RAW_NAME}..."
@@ -93,7 +93,7 @@ push:
 	@echo
 
 .PHONY: getplasmactl
-## Upload artifacts (plasmactl binaries) to an online raw repository
+## Upload latest getplasmactl script to Nexus repository. It then can be used to easily download the right plasmactl binary according to your system
 getplasmactl:
 	@echo "- Action: getplasmactl"
 	$(eval FILE_NAME = get-plasmactl.sh)
