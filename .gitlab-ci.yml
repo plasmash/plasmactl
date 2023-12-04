@@ -40,7 +40,7 @@ push plasmactl artifacts:
       echo "VERSION=${VERSION}"
       echo "TARGET_VERSION=${TARGET_VERSION}"
       echo "##############################################################################################"
-    - make binaries PLASMACTL_ARTIFACT_REPOSITORY_USER_PW="${PLASMACTL_ARTIFACT_REPOSITORY_USER_PW_TMP}" TARGET_VERSION="${VERSION}"
+    - make binaries PLASMACTL_ARTIFACT_REPOSITORY_USER_PW="${PLASMACTL_ARTIFACT_REPOSITORY_USER_PW_TMP}" TARGET_VERSION="${TARGET_VERSION}"
 
 push get-plasmactl script:
   stage: main
