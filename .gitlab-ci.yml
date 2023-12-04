@@ -28,7 +28,7 @@ push plasmactl artifacts:
   #when: manual #TODO: Remove
   variables:
     DEBIAN_FRONTEND: 'noninteractive'
-    #VERSION: 'v0.2.5' #TODO: Remove
+    VERSION: 'v0.2.5' #TODO: Remove
   before_script:
     - apt-get update -y && apt-get install -y openssl make curl git golang-go
   script:
