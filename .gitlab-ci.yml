@@ -5,7 +5,6 @@ variables:
   GIT_STRATEGY: fetch
 
 image: golang:latest
-pull_policy : always
 
 before_script:
   - date
@@ -26,6 +25,9 @@ stages:
 
 push plasmactl artifacts:
   stage: main
+  image:
+    name: golang:latest
+    pull_policy : always
   when: manual #TODO: Remove
   variables:
     DEBIAN_FRONTEND: 'noninteractive'
