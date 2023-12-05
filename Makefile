@@ -49,7 +49,7 @@ provision:
 	@echo
 	@echo "- Action: provision"
 	@echo "-- Getting latest launchr binary file (release: ${LAUNCHR_BINARY_RELEASE_VERSION}) compatible with your OS & Arch..."
-	curl -O -L ${BINARY_URL}/releases/latest/download/${BINARY_NAME}
+	curl -O -L ${BINARY_URL}/releases/latest/download/${BINARY_NAME} # TODO: Get sources and compile launchr_Linux_x86_64 binary instead of getting binary that may not be available
 	@echo "-- Comparing checksums..."
 	echo '${LAUNCHR_BINARY_CHECKSUM_EXPECTED} ${BINARY_NAME}' | sha256sum --check
 	chmod +x ${BINARY_NAME}
