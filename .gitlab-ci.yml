@@ -5,6 +5,7 @@ variables:
   GIT_STRATEGY: fetch
 
 image: golang:latest
+pull_policy : always
 
 before_script:
   - date
@@ -30,6 +31,7 @@ push plasmactl artifacts:
     DEBIAN_FRONTEND: 'noninteractive'
   before_script:
     - apt-get update -y && apt-get install -y openssl make curl git golang-go
+    - go version
   script:
     - export PLASMACTL_ARTIFACT_REPOSITORY_USER_PW_TMP="$(echo "${PLASMACTL_ARTIFACT_REPOSITORY_USER_PW_BASE64}" | base64 -d)"
     - export TARGET_VERSION="$(echo "${VERSION}")"
@@ -37,7 +39,7 @@ push plasmactl artifacts:
       echo
       echo "##############################################################################################"
       echo "- Listing variables..."
-      echo "VERSION (TARGET_VERSION)=${VERSION}"
+      echo "VERSION (TARGET_VERSION) = ${VERSION}"
       echo "##############################################################################################"
     - make binaries PLASMACTL_ARTIFACT_REPOSITORY_USER_PW="${PLASMACTL_ARTIFACT_REPOSITORY_USER_PW_TMP}" TARGET_VERSION="${TARGET_VERSION}"
 
