@@ -25,10 +25,9 @@ stages:
 
 push plasmactl artifacts:
   stage: main
-  #when: manual #TODO: Remove
+  when: manual #TODO: Remove
   variables:
     DEBIAN_FRONTEND: 'noninteractive'
-    VERSION: 'v0.2.5' #TODO: Remove
   before_script:
     - apt-get update -y && apt-get install -y openssl make curl git golang-go
   script:
@@ -38,8 +37,7 @@ push plasmactl artifacts:
       echo
       echo "##############################################################################################"
       echo "- Listing variables..."
-      echo "VERSION=${VERSION}"
-      echo "TARGET_VERSION=${TARGET_VERSION}"
+      echo "VERSION (TARGET_VERSION)=${VERSION}"
       echo "##############################################################################################"
     - make binaries PLASMACTL_ARTIFACT_REPOSITORY_USER_PW="${PLASMACTL_ARTIFACT_REPOSITORY_USER_PW_TMP}" TARGET_VERSION="${TARGET_VERSION}"
 

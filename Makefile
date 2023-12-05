@@ -26,7 +26,7 @@ xx:
 .DEFAULT_GOAL := help
 
 .PHONY: binaries
-## Everything below, sequentially
+## Sequentially: check provision build push clean
 binaries: check provision build push clean
 
 
@@ -35,7 +35,7 @@ binaries: check provision build push clean
 check:
 	@echo
 	@echo "- Action: check"
-	# Check if the variable is empty or null
+	# Check if TARGET_VERSION is set
 	$(if $(TARGET_VERSION),,$(error TARGET_VERSION is not set: You need to pass it as make command argument))
 	# Check if TARGET_VERSION matches SemVer pattern
 	$(if $(shell echo "$(TARGET_VERSION)" | grep -E '^v?[0-9]+\.[0-9]+\.[0-9]+.*$$'),,\
