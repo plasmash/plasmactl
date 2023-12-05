@@ -303,4 +303,3 @@ output "$footer_notes" "warning"
 fi
 output ""
 
-

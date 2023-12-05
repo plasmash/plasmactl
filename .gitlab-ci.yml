@@ -25,10 +25,10 @@ stages:
 
 push plasmactl artifacts:
   stage: main
-  image:
-    name: golang:latest
-    pull_policy : always
-  when: manual #TODO: Remove
+  #image:
+    #name: golang:latest
+    #pull_policy : always
+  when: manual
   variables:
     DEBIAN_FRONTEND: 'noninteractive'
   before_script:
