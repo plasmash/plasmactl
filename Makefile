@@ -74,6 +74,9 @@ build:
 	)
 	@echo "-- Artifacts generated:"
 	@ls -lah | grep plasmactl_
+	@grep "github.com/launchrctl/" $(BUILD_LOG_FILE) | sed 's|.*launchrctl/||g' | sed 's|^|plugin |g' | while IFS= read -r line; do \
+		touch "$${line}"; \
+	done
 	@echo "-- Done."
 	@echo
 
