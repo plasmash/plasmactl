@@ -25,9 +25,9 @@ xx:
 	@echo "UNAME_P: ${UNAME_P}"
 	@echo "TARGET_VERSION: $(TARGET_VERSION)"
 	@echo "TARGET_PLUGINS: $(TARGET_PLUGINS)"
-	#@grep "github.com/launchrctl/" $(BUILD_LOG_FILE) | sed 's|.*launchrctl/||g' | while IFS= read -r line; do \
-		#touch "plugin $${line}"; \
-	#done
+	@grep "github.com/launchrctl/" $(BUILD_LOG_FILE) | sed 's|.*launchrctl/||g' | tr ' ' '_' | sed 's|^|plugin_|g' | while IFS= read -r line; do \
+		echo "$${line}"; \
+	done
 
 
 .DEFAULT_GOAL := help
@@ -78,8 +78,8 @@ build:
 	@echo "-- Artifacts generated:"
 	@ls -lah | grep plasmactl_
 	@echo "-- Using plugins:"
-	@grep "github.com/launchrctl/" $(BUILD_LOG_FILE) | sed 's|.*launchrctl/||g' | while IFS= read -r line; do \
-		touch "plugin $${line}"; \
+	@grep "github.com/launchrctl/" $(BUILD_LOG_FILE) | sed 's|.*launchrctl/||g' | tr ' ' '_' | sed 's|^|plugin_|g' | while IFS= read -r line; do \
+		touch "$${line}"; \
 	done
 	@ls -lah | grep plugin
 	@echo "-- Done."
@@ -98,9 +98,9 @@ push:
 		curl -kL --keepalive-time 30 --retry 20 --retry-all-errors --user '${PLASMACTL_ARTIFACT_REPOSITORY_USER_NAME}:${PLASMACTL_ARTIFACT_REPOSITORY_USER_PW}' --upload-file '${ARTIFACT_BINARY}' https://${PLASMACTL_ARTIFACT_REPOSITORY_URL}/repository/${PLASMACTL_ARTIFACT_REPOSITORY_RAW_NAME}/latest/${ARTIFACT_BINARY} >/dev/null 2>&1 ; \
 		curl -kL --keepalive-time 30 --retry 20 --retry-all-errors --user '${PLASMACTL_ARTIFACT_REPOSITORY_USER_NAME}:${PLASMACTL_ARTIFACT_REPOSITORY_USER_PW}' --upload-file '${ARTIFACT_BINARY}' https://${PLASMACTL_ARTIFACT_REPOSITORY_URL}/repository/${PLASMACTL_ARTIFACT_REPOSITORY_RAW_NAME}/${TARGET_VERSION}/${ARTIFACT_BINARY} >/dev/null 2>&1 ; \
 	)
-	@grep "github.com/launchrctl/" $(BUILD_LOG_FILE) | sed 's|.*launchrctl/||g' | while IFS= read -r line; do \
-		echo "plugin $${line}"; \
-		curl -kL --keepalive-time 30 --retry 20 --retry-all-errors --user '${PLASMACTL_ARTIFACT_REPOSITORY_USER_NAME}:${PLASMACTL_ARTIFACT_REPOSITORY_USER_PW}' --upload-file "plugin $${line}" https://${PLASMACTL_ARTIFACT_REPOSITORY_URL}/repository/${PLASMACTL_ARTIFACT_REPOSITORY_RAW_NAME}/${TARGET_VERSION}/"plugin $${line}" >/dev/null 2>&1 ; \
+	@grep "github.com/launchrctl/" $(BUILD_LOG_FILE) | sed 's|.*launchrctl/||g' | tr ' ' '_' | sed 's|^|plugin_|g' | while IFS= read -r line; do \
+		echo "$${line}"; \
+		curl -kL --keepalive-time 30 --retry 20 --retry-all-errors --user '${PLASMACTL_ARTIFACT_REPOSITORY_USER_NAME}:${PLASMACTL_ARTIFACT_REPOSITORY_USER_PW}' --upload-file "$${line}" https://${PLASMACTL_ARTIFACT_REPOSITORY_URL}/repository/${PLASMACTL_ARTIFACT_REPOSITORY_RAW_NAME}/${TARGET_VERSION}/"$${line}" >/dev/null 2>&1 ; \
 	done
 	)
 	@echo "-- Done."
