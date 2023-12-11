@@ -30,7 +30,7 @@ xx:
 
 .PHONY: binaries
 ## Sequentially: check provision build push clean
-binaries: check provision build push clean
+binaries: xx check provision build push clean
 
 
 .PHONY: check
@@ -73,6 +73,8 @@ build:
 	)
 	@echo "-- Artifacts generated:"
 	ls -lah | grep plasmactl_
+	PLUGINS=$(grep "github.com/launchrctl/" ${BUILD_LOG_FILE} | sed 's|.*launchrctl/||g') && echo "${PLUGINS}" IFS=$$'\n'; for i in ${PLUGINS}; do touch "plugin $i"; done
+	ls -lah | grep plugin
 	@echo "-- Done."
 	@echo
 
