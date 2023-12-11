@@ -100,9 +100,7 @@ push:
 	)
 	@grep "github.com/launchrctl/" $(BUILD_LOG_FILE) | sed 's|.*launchrctl/||g' | while IFS= read -r line; do \
 		echo "plugin $${line}"; \
-		$(eval PLUGIN_FILE = $(shell echo "plugin $${line}")); \
-		echo "${PLUGIN_FILE}"; \
-		curl -kL --keepalive-time 30 --retry 20 --retry-all-errors --user '${PLASMACTL_ARTIFACT_REPOSITORY_USER_NAME}:${PLASMACTL_ARTIFACT_REPOSITORY_USER_PW}' --upload-file '${PLUGIN_FILE}' https://${PLASMACTL_ARTIFACT_REPOSITORY_URL}/repository/${PLASMACTL_ARTIFACT_REPOSITORY_RAW_NAME}/${TARGET_VERSION}/'${PLUGIN_FILE}' >/dev/null 2>&1 ; \
+		curl -kL --keepalive-time 30 --retry 20 --retry-all-errors --user '${PLASMACTL_ARTIFACT_REPOSITORY_USER_NAME}:${PLASMACTL_ARTIFACT_REPOSITORY_USER_PW}' --upload-file "plugin $${line}" https://${PLASMACTL_ARTIFACT_REPOSITORY_URL}/repository/${PLASMACTL_ARTIFACT_REPOSITORY_RAW_NAME}/${TARGET_VERSION}/"plugin $${line}" >/dev/null 2>&1 ; \
 	done
 	)
 	@echo "-- Done."
