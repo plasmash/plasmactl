@@ -28,7 +28,6 @@ push plasmactl artifacts:
   #image:
     #name: golang:latest
     #pull_policy : always
-  when: manual
   variables:
     DEBIAN_FRONTEND: 'noninteractive'
   before_script:
