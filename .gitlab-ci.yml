@@ -23,13 +23,24 @@ stages:
     GIT_STRATEGY: none
   script: echo # CI breaks when none of the job meet condition to be executed
 
-push plasmactl artifacts:
+push get-plasmactl script:
   stage: main
-  #image:
-    #name: golang:latest
-    #pull_policy : always
   variables:
     DEBIAN_FRONTEND: 'noninteractive'
+  before_script:
+    - apt-get update -y && apt-get install -y openssl make curl
+  script:
+    - PLASMACTL_ARTIFACT_REPOSITORY_USER_PW_TMP="$(echo "${PLASMACTL_ARTIFACT_REPOSITORY_USER_PW_BASE64}" | base64 -d)"
+    - make getplasmactl PLASMACTL_ARTIFACT_REPOSITORY_USER_PW="${PLASMACTL_ARTIFACT_REPOSITORY_USER_PW_TMP}"
+  only:
+    changes:
+      - get-plasmactl.sh
+
+push plasmactl artifacts:
+  stage: main
+  variables:
+    DEBIAN_FRONTEND: 'noninteractive'
+    VERSION: "v0.4.3"
   before_script:
     - apt-get update -y && apt-get install -y openssl make curl git golang-go
     - go version
@@ -43,17 +54,11 @@ push plasmactl artifacts:
       echo "VERSION (TARGET_VERSION) = ${VERSION}"
       echo "##############################################################################################"
     - make binaries PLASMACTL_ARTIFACT_REPOSITORY_USER_PW="${PLASMACTL_ARTIFACT_REPOSITORY_USER_PW_TMP}" TARGET_VERSION="${TARGET_VERSION}"
-
-push get-plasmactl script:
-  stage: main
-  variables:
-    DEBIAN_FRONTEND: 'noninteractive'
-  before_script:
-    - apt-get update -y && apt-get install -y openssl make curl
-  script:
-    - PLASMACTL_ARTIFACT_REPOSITORY_USER_PW_TMP="$(echo "${PLASMACTL_ARTIFACT_REPOSITORY_USER_PW_BASE64}" | base64 -d)"
-    - make getplasmactl PLASMACTL_ARTIFACT_REPOSITORY_USER_PW="${PLASMACTL_ARTIFACT_REPOSITORY_USER_PW_TMP}"
-  only:
-    changes:
-      - get-plasmactl.sh
+  artifacts:
+    name: "${CI_COMMIT_REF_NAME}:${CI_COMMIT_SHA}:plasmactl-bin:build"
+    expose_as: 'Build logs'
+    when: always
+    expire_in: 2 weeks
+    paths:
+      - build.log
 

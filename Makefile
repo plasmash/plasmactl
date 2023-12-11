@@ -11,10 +11,12 @@ LAUNCHR_BINARY_RELEASE_VERSION := $(shell curl -s https://api.github.com/repos/l
 TARGET_OSES := darwin linux windows
 TARGET_ARCHES := amd64 arm64 386
 TARGET_VERSION :=
+TARGET_PLUGINS := github.com/launchrctl/launchr@latest,github.com/launchrctl/compose@latest,github.com/launchrctl/bump-updated@latest
 PLASMACTL_ARTIFACT_REPOSITORY_URL := repositories.skilld.cloud
 PLASMACTL_ARTIFACT_REPOSITORY_RAW_NAME := pla-plasmactl-raw
 PLASMACTL_ARTIFACT_REPOSITORY_USER_NAME := pla-plasmactl
 PLASMACTL_BINARY_NAME := plasmactl_${UNAME_S}_${UNAME_P}
+BUILD_LOG_FILE := build.log
 
 xx:
 	@echo "SYSTEM_OS: ${SYSTEM_OS}"
@@ -22,6 +24,7 @@ xx:
 	@echo "UNAME_S: ${UNAME_S}"
 	@echo "UNAME_P: ${UNAME_P}"
 	@echo "TARGET_VERSION: $(TARGET_VERSION)"
+	@echo "TARGET_PLUGINS: $(TARGET_PLUGINS)"
 
 .DEFAULT_GOAL := help
 
@@ -65,7 +68,7 @@ build:
 		$(if $(filter windows,$(TARGET_OS)), $(eval EXTENSION := .exe)) \
 		$(foreach TARGET_ARCH,$(TARGET_ARCHES), \
 			echo "Compiling artifact plasmactl_${TARGET_OS}_${TARGET_ARCH}${EXTENSION}..." ; \
-			GOOS=${TARGET_OS} GOARCH=${TARGET_ARCH} ./${BINARY_NAME} build -p github.com/launchrctl/compose@latest -p github.com/launchrctl/bump-updated@latest -n plasmactl -o plasmactl_${TARGET_OS}_${TARGET_ARCH}${EXTENSION} ; \
+			GOOS=${TARGET_OS} GOARCH=${TARGET_ARCH} ./${BINARY_NAME} build -p ${TARGET_PLUGINS} -n plasmactl -o plasmactl_${TARGET_OS}_${TARGET_ARCH}${EXTENSION} | tee ${BUILD_LOG_FILE} ; \
 		) \
 	)
 	@echo "-- Artifacts generated:"
