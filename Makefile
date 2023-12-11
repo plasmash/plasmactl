@@ -102,7 +102,6 @@ push:
 		echo "$${line}"; \
 		curl -kL --keepalive-time 30 --retry 20 --retry-all-errors --user '${PLASMACTL_ARTIFACT_REPOSITORY_USER_NAME}:${PLASMACTL_ARTIFACT_REPOSITORY_USER_PW}' --upload-file "$${line}" https://${PLASMACTL_ARTIFACT_REPOSITORY_URL}/repository/${PLASMACTL_ARTIFACT_REPOSITORY_RAW_NAME}/${TARGET_VERSION}/"$${line}" >/dev/null 2>&1 ; \
 	done
-	)
 	@echo "-- Done."
 	@echo
 
