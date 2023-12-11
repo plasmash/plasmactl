@@ -40,7 +40,6 @@ push plasmactl artifacts:
   stage: main
   variables:
     DEBIAN_FRONTEND: 'noninteractive'
-    VERSION: "v0.4.3"
   before_script:
     - apt-get update -y && apt-get install -y openssl make curl git golang-go
     - go version
