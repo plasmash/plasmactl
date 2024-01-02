@@ -32,9 +32,10 @@ push get-plasmactl script:
   script:
     - PLASMACTL_ARTIFACT_REPOSITORY_USER_PW_TMP="$(echo "${PLASMACTL_ARTIFACT_REPOSITORY_USER_PW_BASE64}" | base64 -d)"
     - make getplasmactl PLASMACTL_ARTIFACT_REPOSITORY_USER_PW="${PLASMACTL_ARTIFACT_REPOSITORY_USER_PW_TMP}"
-  only:
-    changes:
-      - get-plasmactl.sh
+  rules:
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH && $CI_PIPELINE_SOURCE != 'schedule'
+      changes:
+        - get-plasmactl.sh
 
 push plasmactl artifacts:
   stage: main
@@ -60,4 +61,6 @@ push plasmactl artifacts:
     expire_in: 2 weeks
     paths:
       - build.log
+  rules:
+    - if: $CI_PIPELINE_SOURCE == 'web' || $CI_PIPELINE_SOURCE == 'schedule'
 
