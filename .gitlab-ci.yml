@@ -7,11 +7,15 @@ variables:
 image: golang:latest
 
 before_script:
+  - env
   - date
   - pwd
   - ls -lah
   - whoami
   - id
+  - cat /etc/os-release
+  - cat /etc/resolv.conf
+  - ls -lah /var/run/docker.sock || true # plasmactl dependency
 
 stages:
   - placeholder
