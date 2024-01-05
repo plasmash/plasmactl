@@ -13,3 +13,5 @@ plasmactl_windows_amd64.exe
 plasmactl_windows_arm64.exe
 plasmactl_windows_386.exe
 build_*
+build.log
+plugin*

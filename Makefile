@@ -11,12 +11,14 @@ LAUNCHR_BINARY_RELEASE_VERSION := $(shell curl -s https://api.github.com/repos/l
 TARGET_OSES := darwin linux windows
 TARGET_ARCHES := amd64 arm64 386
 TARGET_VERSION :=
-TARGET_PLUGINS := github.com/launchrctl/launchr@latest,github.com/launchrctl/compose@latest
+TARGET_PLUGINS := github.com/launchrctl/launchr@latest,github.com/launchrctl/compose@latest,github.com/skilld-labs/components-bump@latest
 PLASMACTL_ARTIFACT_REPOSITORY_URL := repositories.skilld.cloud
 PLASMACTL_ARTIFACT_REPOSITORY_RAW_NAME := pla-plasmactl-raw
 PLASMACTL_ARTIFACT_REPOSITORY_USER_NAME := pla-plasmactl
 PLASMACTL_BINARY_NAME := plasmactl_${UNAME_S}_${UNAME_P}
 BUILD_LOG_FILE := build.log
+BUILD_LOG_FILTER := "github.com/launchrctl/\|github.com/skilld-labs/"
+BUILD_LOG_STRING_TR := $(shell echo "sed 's|.*github.com/||g' | sed 's|^|plugin |g' | sed 's|/| |g'")
 
 xx:
 	@echo "SYSTEM_OS: ${SYSTEM_OS}"
@@ -25,6 +27,8 @@ xx:
 	@echo "UNAME_P: ${UNAME_P}"
 	@echo "TARGET_VERSION: $(TARGET_VERSION)"
 	@echo "TARGET_PLUGINS: $(TARGET_PLUGINS)"
+	@echo "BUILD_LOG_FILTER: ${BUILD_LOG_FILTER}"
+	@echo "BUILD_LOG_STRING_TR: ${BUILD_LOG_STRING_TR}"
 
 
 .DEFAULT_GOAL := help
@@ -74,7 +78,7 @@ build:
 	)
 	@echo "-- Artifacts generated:"
 	@ls -lah | grep plasmactl_
-	@grep "github.com/launchrctl/" $(BUILD_LOG_FILE) | sed 's|.*launchrctl/||g' | sed 's|^|plugin |g' | while IFS= read -r line; do \
+	@grep ${BUILD_LOG_FILTER} $(BUILD_LOG_FILE) | ${BUILD_LOG_STRING_TR} | while IFS= read -r line; do \
 		touch "$${line}"; \
 	done
 	@echo "-- Done."
@@ -90,13 +94,14 @@ push:
 	$(if $(ARTIFACT_BINARIES),,$(error No artifact binary file found in current directory (plasmactl_*)))
 	@echo "(This can take some time)"
 	@$(foreach ARTIFACT_BINARY,$(ARTIFACT_BINARIES), \
-		curl -kL --keepalive-time 30 --retry 20 --retry-all-errors --user '${PLASMACTL_ARTIFACT_REPOSITORY_USER_NAME}:${PLASMACTL_ARTIFACT_REPOSITORY_USER_PW}' --upload-file '${ARTIFACT_BINARY}' https://${PLASMACTL_ARTIFACT_REPOSITORY_URL}/repository/${PLASMACTL_ARTIFACT_REPOSITORY_RAW_NAME}/latest/${ARTIFACT_BINARY} >/dev/null 2>&1 ; \
 		curl -kL --keepalive-time 30 --retry 20 --retry-all-errors --user '${PLASMACTL_ARTIFACT_REPOSITORY_USER_NAME}:${PLASMACTL_ARTIFACT_REPOSITORY_USER_PW}' --upload-file '${ARTIFACT_BINARY}' https://${PLASMACTL_ARTIFACT_REPOSITORY_URL}/repository/${PLASMACTL_ARTIFACT_REPOSITORY_RAW_NAME}/${TARGET_VERSION}/${ARTIFACT_BINARY} >/dev/null 2>&1 ; \
+		curl -kL --keepalive-time 30 --retry 20 --retry-all-errors --user '${PLASMACTL_ARTIFACT_REPOSITORY_USER_NAME}:${PLASMACTL_ARTIFACT_REPOSITORY_USER_PW}' --upload-file '${ARTIFACT_BINARY}' https://${PLASMACTL_ARTIFACT_REPOSITORY_URL}/repository/${PLASMACTL_ARTIFACT_REPOSITORY_RAW_NAME}/latest/${ARTIFACT_BINARY} >/dev/null 2>&1 ; \
 	)
 	@echo "-- Included plugins:"
-	@grep "github.com/launchrctl/" $(BUILD_LOG_FILE) | sed 's|.*launchrctl/||g' | sed 's|^|plugin |g' | while IFS= read -r line; do \
+	@grep ${BUILD_LOG_FILTER} $(BUILD_LOG_FILE) | ${BUILD_LOG_STRING_TR} | while IFS= read -r line; do \
 		echo "$${line}"; \
 		curl -kL --keepalive-time 30 --retry 20 --retry-all-errors --user '${PLASMACTL_ARTIFACT_REPOSITORY_USER_NAME}:${PLASMACTL_ARTIFACT_REPOSITORY_USER_PW}' --upload-file "$${line}" https://${PLASMACTL_ARTIFACT_REPOSITORY_URL}/repository/${PLASMACTL_ARTIFACT_REPOSITORY_RAW_NAME}/${TARGET_VERSION}/"$(echo $${line} | sed 's| |%20|g')" >/dev/null 2>&1 ; \
+		curl -kL --keepalive-time 30 --retry 20 --retry-all-errors --user '${PLASMACTL_ARTIFACT_REPOSITORY_USER_NAME}:${PLASMACTL_ARTIFACT_REPOSITORY_USER_PW}' --upload-file "$${line}" https://${PLASMACTL_ARTIFACT_REPOSITORY_URL}/repository/${PLASMACTL_ARTIFACT_REPOSITORY_RAW_NAME}/latest/"$(echo $${line} | sed 's| |%20|g')" >/dev/null 2>&1 ; \
 	done
 	@echo "-- Done."
 	@echo
