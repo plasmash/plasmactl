@@ -191,10 +191,9 @@ if [ $# -eq 2 ]; then
   password="$2"
 else
   # Prompt user for username and password
-  output "Username: "
-  read -r username
-  output "Password: "
-  read -r password
+  output "Enter your Skilld.cloud credentials:"
+  read -p "Username: " username
+  read -sp "Password: " password
   output ""
 fi
 
