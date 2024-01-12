@@ -73,7 +73,7 @@ build:
 		$(if $(filter windows,$(TARGET_OS)), $(eval EXTENSION := .exe)) \
 		$(foreach TARGET_ARCH,$(TARGET_ARCHES), \
 			echo "Compiling artifact plasmactl_${TARGET_OS}_${TARGET_ARCH}${EXTENSION}..." ; \
-			GOOS=${TARGET_OS} GOARCH=${TARGET_ARCH} ./${BINARY_NAME} build -p ${TARGET_PLUGINS} -n plasmactl -o plasmactl_${TARGET_OS}_${TARGET_ARCH}${EXTENSION} 2>&1 | tee ${BUILD_LOG_FILE} ; \
+			GOOS=${TARGET_OS} GOARCH=${TARGET_ARCH} ./${BINARY_NAME} build -p ${TARGET_PLUGINS} -n plasmactl -o plasmactl_${TARGET_OS}_${TARGET_ARCH}${EXTENSION} --build-version ${TARGET_VERSION} 2>&1 | tee ${BUILD_LOG_FILE} ; \
 		) \
 	)
 	@echo "-- Artifacts generated:"
