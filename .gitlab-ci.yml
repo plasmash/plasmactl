@@ -58,6 +58,12 @@ push plasmactl artifacts:
       echo "VERSION (TARGET_VERSION) = ${VERSION}"
       echo "##############################################################################################"
     - make binaries PLASMACTL_ARTIFACT_REPOSITORY_USER_PW="${PLASMACTL_ARTIFACT_REPOSITORY_USER_PW_TMP}" TARGET_VERSION="${TARGET_VERSION}"
+    - |
+      echo
+      echo "##############################################################################################"
+      echo "- Successful build:"
+      echo "VERSION (TARGET_VERSION) = ${VERSION}"
+      echo "##############################################################################################"
   artifacts:
     name: "${CI_COMMIT_REF_NAME}:${CI_COMMIT_SHA}:plasmactl-bin:build"
     expose_as: 'Build logs'
