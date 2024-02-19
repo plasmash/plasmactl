@@ -21,7 +21,7 @@ stages:
   - placeholder
   - main
 
-.placeholder:
+placeholder:
   stage: placeholder
   variables:
     GIT_STRATEGY: none
