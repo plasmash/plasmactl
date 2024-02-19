@@ -14,5 +14,3 @@ echo "Enter your Skilld.cloud credentials:" && echo -n "Username: " && read user
 ```
 - Fill your Skilld platform credentials when prompted
 
-
-
