@@ -4,7 +4,7 @@ variables:
   GIT_DEPTH: "1"
   GIT_STRATEGY: fetch
 
-image: golang:latest
+image: golang:1.22.0-bookworm
 
 before_script:
   - env
