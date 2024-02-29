@@ -11,14 +11,14 @@ LAUNCHR_BINARY_RELEASE_VERSION := $(shell curl -s https://api.github.com/repos/l
 TARGET_OSES := darwin linux windows
 TARGET_ARCHES := amd64 arm64 386
 TARGET_VERSION :=
-TARGET_PLUGINS := github.com/launchrctl/launchr@latest,github.com/launchrctl/compose@latest,github.com/skilld-labs/plasmactl-bump@latest,github.com/skilld-labs/plasmactl-publish@latest
+TARGET_PLUGINS := github.com/launchrctl/launchr@latest,github.com/launchrctl/compose@latest,github.com/skilld-labs/plasmactl-bump@latest,github.com/skilld-labs/plasmactl-package@latest,github.com/skilld-labs/plasmactl-publish@latest
 PLASMACTL_ARTIFACT_REPOSITORY_URL := repositories.skilld.cloud
 PLASMACTL_ARTIFACT_REPOSITORY_RAW_NAME := pla-plasmactl-raw
 PLASMACTL_ARTIFACT_REPOSITORY_USER_NAME := pla-plasmactl
 PLASMACTL_BINARY_NAME := plasmactl_${UNAME_S}_${UNAME_P}
 BUILD_LOG_FILE := build.log
-BUILD_LOG_FILTER := "github.com/launchrctl/\|github.com/skilld-labs/"
-BUILD_LOG_STRING_TR := $(shell echo "sed 's|.*github.com/||g' | sed 's|^|plugin |g' | sed 's|/| |g'")
+BUILD_LOG_FILTER := "^go: added github.com/launchrctl/\|^go: added github.com/skilld-labs/"
+BUILD_LOG_STRING_TR := $(shell echo "sed 's|^go: added ||g' | sed 's|.*github.com/||g' | sed 's|^|plugin |g' | sed 's|/| |g'")
 
 xx:
 	@echo "SYSTEM_OS: ${SYSTEM_OS}"
