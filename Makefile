@@ -19,6 +19,8 @@ PLASMACTL_BINARY_NAME := plasmactl_${UNAME_S}_${UNAME_P}
 BUILD_LOG_FILE := build.log
 BUILD_LOG_FILTER := "^go: added github.com/launchrctl/\|^go: added github.com/skilld-labs/"
 BUILD_LOG_STRING_TR := $(shell echo "sed 's|^go: added ||g' | sed 's|.*github.com/||g' | sed 's|^|plugin |g' | sed 's|/| |g'")
+STABLE_RELEASE_FILE_NAME := stable_release
+REMOTE_STABLE_RELEASE := $(shell echo "Deferred evaluation")
 
 xx:
 	@echo "SYSTEM_OS: ${SYSTEM_OS}"
@@ -33,9 +35,12 @@ xx:
 
 .DEFAULT_GOAL := help
 
+evaluate_remote_stable_release:
+	$(eval REMOTE_STABLE_RELEASE := $(shell curl -kL --keepalive-time 30 --retry 20 -s --user '${PLASMACTL_ARTIFACT_REPOSITORY_USER_NAME}:${PLASMACTL_ARTIFACT_REPOSITORY_USER_PW}' https://${PLASMACTL_ARTIFACT_REPOSITORY_URL}/repository/${PLASMACTL_ARTIFACT_REPOSITORY_RAW_NAME}/${STABLE_RELEASE_FILE_NAME} --fail))
+
 .PHONY: binaries
 ## Sequentially: check provision build push clean
-binaries: xx check provision build push clean
+binaries: xx check provision build push pin validate clean
 
 
 .PHONY: check
@@ -94,15 +99,34 @@ push:
 	$(if $(ARTIFACT_BINARIES),,$(error No artifact binary file found in current directory (plasmactl_*)))
 	@echo "(This can take some time)"
 	@$(foreach ARTIFACT_BINARY,$(ARTIFACT_BINARIES), \
-		curl -kL --keepalive-time 30 --retry 20 --retry-all-errors --user '${PLASMACTL_ARTIFACT_REPOSITORY_USER_NAME}:${PLASMACTL_ARTIFACT_REPOSITORY_USER_PW}' --upload-file '${ARTIFACT_BINARY}' https://${PLASMACTL_ARTIFACT_REPOSITORY_URL}/repository/${PLASMACTL_ARTIFACT_REPOSITORY_RAW_NAME}/${TARGET_VERSION}/${ARTIFACT_BINARY} >/dev/null 2>&1 ; \
-		curl -kL --keepalive-time 30 --retry 20 --retry-all-errors --user '${PLASMACTL_ARTIFACT_REPOSITORY_USER_NAME}:${PLASMACTL_ARTIFACT_REPOSITORY_USER_PW}' --upload-file '${ARTIFACT_BINARY}' https://${PLASMACTL_ARTIFACT_REPOSITORY_URL}/repository/${PLASMACTL_ARTIFACT_REPOSITORY_RAW_NAME}/latest/${ARTIFACT_BINARY} >/dev/null 2>&1 ; \
+		curl -kL --keepalive-time 30 --retry 20 --retry-all-errors -s --user '${PLASMACTL_ARTIFACT_REPOSITORY_USER_NAME}:${PLASMACTL_ARTIFACT_REPOSITORY_USER_PW}' --upload-file '${ARTIFACT_BINARY}' https://${PLASMACTL_ARTIFACT_REPOSITORY_URL}/repository/${PLASMACTL_ARTIFACT_REPOSITORY_RAW_NAME}/${TARGET_VERSION}/${ARTIFACT_BINARY}; \
 	)
 	@echo "-- Included plugins:"
 	@grep ${BUILD_LOG_FILTER} $(BUILD_LOG_FILE) | ${BUILD_LOG_STRING_TR} | while IFS= read -r line; do \
 		echo "$${line}"; \
-		curl -kL --keepalive-time 30 --retry 20 --retry-all-errors --user '${PLASMACTL_ARTIFACT_REPOSITORY_USER_NAME}:${PLASMACTL_ARTIFACT_REPOSITORY_USER_PW}' --upload-file "$${line}" https://${PLASMACTL_ARTIFACT_REPOSITORY_URL}/repository/${PLASMACTL_ARTIFACT_REPOSITORY_RAW_NAME}/${TARGET_VERSION}/"$(echo $${line} | sed 's| |%20|g')" >/dev/null 2>&1 ; \
-		curl -kL --keepalive-time 30 --retry 20 --retry-all-errors --user '${PLASMACTL_ARTIFACT_REPOSITORY_USER_NAME}:${PLASMACTL_ARTIFACT_REPOSITORY_USER_PW}' --upload-file "$${line}" https://${PLASMACTL_ARTIFACT_REPOSITORY_URL}/repository/${PLASMACTL_ARTIFACT_REPOSITORY_RAW_NAME}/latest/"$(echo $${line} | sed 's| |%20|g')" >/dev/null 2>&1 ; \
+		curl -kL --keepalive-time 30 --retry 20 --retry-all-errors -s --user '${PLASMACTL_ARTIFACT_REPOSITORY_USER_NAME}:${PLASMACTL_ARTIFACT_REPOSITORY_USER_PW}' --upload-file "$${line}" https://${PLASMACTL_ARTIFACT_REPOSITORY_URL}/repository/${PLASMACTL_ARTIFACT_REPOSITORY_RAW_NAME}/${TARGET_VERSION}/"$(echo $${line} | sed 's| |%20|g')"; \
 	done
+	@echo "-- Done."
+
+.PHONY: pin
+## Pin new target version as stable_release
+pin:
+	@echo "- Action: pin"
+	@echo "-- Pinning ${TARGET_VERSION} as stable_release..."
+	$(shell echo "${TARGET_VERSION}" > stable_release)
+	@curl -kL --keepalive-time 30 --retry 20 -s --user '${PLASMACTL_ARTIFACT_REPOSITORY_USER_NAME}:${PLASMACTL_ARTIFACT_REPOSITORY_USER_PW}' --upload-file "${STABLE_RELEASE_FILE_NAME}" https://${PLASMACTL_ARTIFACT_REPOSITORY_URL}/repository/${PLASMACTL_ARTIFACT_REPOSITORY_RAW_NAME}/${STABLE_RELEASE_FILE_NAME} --fail || exit 1
+	@echo "-- Done."
+	@echo
+
+.PHONY: validate
+## Validate that stable_release has been updated on remote
+validate: evaluate_remote_stable_release
+	@echo "- Action: validate"
+	@echo "-- Validating that stable_release has been updated on remote..."
+	@echo "TARGET_VERSION: $(TARGET_VERSION)"
+	@echo "REMOTE_STABLE_RELEASE: $(REMOTE_STABLE_RELEASE)"
+	$(if $(value REMOTE_STABLE_RELEASE),,$(error ERROR: REMOTE_STABLE_RELEASE is empty or unset))
+	@if [ "$(TARGET_VERSION)" != "$(REMOTE_STABLE_RELEASE)" ]; then echo "-- Error: Remote version does not seem to have been updated as expected."; exit 1; else echo "-- Versions match.";fi
 	@echo "-- Done."
 	@echo
 
@@ -114,7 +138,7 @@ getplasmactl:
 	@test -f ${FILE_NAME} || (echo "Error: ${FILE_NAME} file not found in current directory" && exit 1)
 	@echo "-- Pushing get-plasmactl.sh to https://${PLASMACTL_ARTIFACT_REPOSITORY_URL}/#browse/browse:${PLASMACTL_ARTIFACT_REPOSITORY_RAW_NAME}..."
 	$(if $(PLASMACTL_ARTIFACT_REPOSITORY_USER_PW),,$(error PLASMACTL_ARTIFACT_REPOSITORY_USER_PW is not set: You need to pass it as make command argument))
-	@curl -kL --keepalive-time 30 --retry 20 --retry-all-errors --user '${PLASMACTL_ARTIFACT_REPOSITORY_USER_NAME}:${PLASMACTL_ARTIFACT_REPOSITORY_USER_PW}' --upload-file '${FILE_NAME}' https://${PLASMACTL_ARTIFACT_REPOSITORY_URL}/repository/${PLASMACTL_ARTIFACT_REPOSITORY_RAW_NAME}/${FILE_NAME} >/dev/null 2>&1
+	@curl -kL --keepalive-time 30 --retry 20 --retry-all-errors -s --user '${PLASMACTL_ARTIFACT_REPOSITORY_USER_NAME}:${PLASMACTL_ARTIFACT_REPOSITORY_USER_PW}' --upload-file '${FILE_NAME}' https://${PLASMACTL_ARTIFACT_REPOSITORY_URL}/repository/${PLASMACTL_ARTIFACT_REPOSITORY_RAW_NAME}/${FILE_NAME}
 	@echo "-- Done."
 	@echo
 

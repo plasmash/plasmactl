@@ -73,4 +73,5 @@ push plasmactl artifacts:
       - build.log
   rules:
     - if: $CI_PIPELINE_SOURCE == 'web' || $CI_PIPELINE_SOURCE == 'schedule'
+    - if: $CI_PIPELINE_SOURCE == 'merge_request_event' && $VERSION
 
