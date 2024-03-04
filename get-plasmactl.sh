@@ -9,7 +9,9 @@ os=$(uname -s)
 arch=$(uname -m)
 
 # Define the URL pattern for the file
-baseurl="https://repositories.skilld.cloud/repository/pla-plasmactl-raw/latest/plasmactl_%s_%s%s"
+baseurl="https://repositories.skilld.cloud/repository/pla-plasmactl-raw"
+release_path="stable_release"
+binaries_path="%s/%s/plasmactl_%s_%s%s"
 
 # Create a log file where every output will be piped to
 : "${LOG_FILE:=/tmp/get-plasmactl-$(date '+%Y%m%d-%H%M%S').log}"
@@ -181,10 +183,6 @@ esac
 
 output "Starting plasmactl installation..." "success"
 
-# Format the URL with the determined 'os', 'arch' and 'extension' values
-url=$(printf "$baseurl" "$os" "$arch" "$extension")
-output "Downloading file: ${url}"
-
 # Check if username and password are passed as script arguments
 if [ $# -eq 2 ]; then
   username="$1"
@@ -197,23 +195,45 @@ else
   output ""
 fi
 
+stable_release_url=$(echo "${baseurl}/${release_path}")
 # Check the validity of the credentials
-http_code=$(validate_credentials "$username" "$password" "$url")
+http_code=$(validate_credentials "$username" "$password" "${stable_release_url}")
 if [ -z "$http_code" ]; then
   output "Error: Failed to validate credentials. Access denied." "error"
   exit 1
 elif [ "$http_code" -eq 200 ]; then
   output "Valid credentials. Access granted."
+elif [ "$http_code" -eq 401 ]; then
+  output "Error: HTTP $http_code: Unauthorized. Credentials seem to be invalid." "error"
+  exit 1
+elif [ "$http_code" -eq 404 ]; then
+  output "Error: HTTP $http_code: Not Found. File ${stable_release_url} does not exist." "error"
+  exit 1
 else
-  output "Error: HTTP $http_code. Either credentials are invalid or file $binaryname does not exist." "error"
+  output "Error: HTTP $http_code. An issue appeared while trying to validate credentials against ${stable_release_url}." "error"
   exit 1
 fi
+
+# Get value of stable_release
+if command -v curl >/dev/null 2>&1; then
+  stable_release=$(curl -sS -u "$username:$password" -X GET "${stable_release_url}" | tr -d '\n')
+elif command -v wget >/dev/null 2>&1; then
+  stable_release=$(wget -q --user="$username" --password="$password" "${stable_release_url}" -O - | tr -d '\n')
+else
+  output "Neither curl nor wget were found. Please install one of them." "error"
+  exit 1
+fi
+output "Stable release: ${stable_release}"
+
+# Format the URL with the determined 'os', 'arch' and 'extension' values
+url=$(printf "$binaries_path" "$baseurl" "$stable_release" "$os" "$arch" "$extension")
+output "Downloading file: ${url}"
 
 # Download the file using curl or wget with Basic Auth header
 if command -v curl >/dev/null 2>&1; then
   curl -sS -u "$username:$password" -O "$url"
 elif command -v wget >/dev/null 2>&1; then
-  wget --user="$username" --password="$password" "$url"
+  wget -q --user="$username" --password="$password" "$url"
 else
   output "Neither curl nor wget were found. Please install one of them." "error"
   exit 1
