@@ -64,6 +64,8 @@ push plasmactl artifacts:
       echo "- Successful build:"
       echo "VERSION (TARGET_VERSION) = ${VERSION}"
       echo "##############################################################################################"
+      echo " /!\ Don't forget to upgrade plasmactl on Pro-4-S sd-92483"
+      echo "##############################################################################################"
   artifacts:
     name: "${CI_COMMIT_REF_NAME}:${CI_COMMIT_SHA}:plasmactl-bin:build"
     expose_as: 'Build logs'
