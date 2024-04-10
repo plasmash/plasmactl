@@ -43,6 +43,8 @@ push get-plasmactl script:
 
 push plasmactl artifacts:
   stage: main
+  tags:
+    - edge
   variables:
     DEBIAN_FRONTEND: 'noninteractive'
   before_script:
