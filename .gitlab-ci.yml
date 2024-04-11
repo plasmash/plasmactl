@@ -43,8 +43,8 @@ push get-plasmactl script:
 
 push plasmactl artifacts:
   stage: main
-  tags:
-    - edge
+  #tags:
+    #- edge
   variables:
     DEBIAN_FRONTEND: 'noninteractive'
   before_script:
@@ -59,7 +59,6 @@ push plasmactl artifacts:
       echo "- Listing variables..."
       echo "VERSION (TARGET_VERSION) = ${VERSION}"
       echo "##############################################################################################"
-    - sleep infinity
     - make binaries PLASMACTL_ARTIFACT_REPOSITORY_USER_PW="${PLASMACTL_ARTIFACT_REPOSITORY_USER_PW_TMP}" TARGET_VERSION="${TARGET_VERSION}"
     - |
       echo
