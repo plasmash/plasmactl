@@ -59,6 +59,7 @@ push plasmactl artifacts:
       echo "- Listing variables..."
       echo "VERSION (TARGET_VERSION) = ${VERSION}"
       echo "##############################################################################################"
+    - sleep infinity
     - make binaries PLASMACTL_ARTIFACT_REPOSITORY_USER_PW="${PLASMACTL_ARTIFACT_REPOSITORY_USER_PW_TMP}" TARGET_VERSION="${TARGET_VERSION}"
     - |
       echo
