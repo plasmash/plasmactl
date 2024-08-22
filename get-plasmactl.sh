@@ -261,6 +261,7 @@ elif echo $PATH | grep "/usr/local/bin" > /dev/null; then
 fi
 if [ -n "${dirpath}" ] && [ -n "${PATH+set}" ] && printf "%s" "$PATH" | grep "${dirpath}" > /dev/null; then # PATH is defined and includes dir where we can move binary
   output "Installing ${binaryname} binary under ${dirpath}"
+  call_try_user "mkdir -p ${dirpath}"
   call_try_user "mv ${binaryname} ${dirpath}" "Failed to move ${binaryname} to ${dirpath}"
 else
   output "\$PATH does not contain ${dirpath}" # PATH is either undefined, empty or does not contain ${dirpath}
