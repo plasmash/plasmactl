@@ -4,7 +4,7 @@ variables:
   GIT_DEPTH: "1"
   GIT_STRATEGY: fetch
 
-image: golang:1.22.2-bookworm
+image: golang:1.23.2-bookworm
 
 before_script:
   - env
@@ -43,8 +43,8 @@ push get-plasmactl script:
 
 push plasmactl artifacts:
   stage: main
-  #tags:
-    #- edge
+  tags:
+    - edge
   variables:
     DEBIAN_FRONTEND: 'noninteractive'
   before_script:

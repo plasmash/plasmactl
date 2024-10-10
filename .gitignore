@@ -16,3 +16,4 @@ build_*
 build.log
 plugin*
 stable_release
+.plasmactl/

@@ -11,7 +11,7 @@ LAUNCHR_BINARY_RELEASE_VERSION := $(shell curl -s https://api.github.com/repos/l
 TARGET_OSES := darwin linux windows
 TARGET_ARCHES := amd64 arm64 386
 TARGET_VERSION :=
-TARGET_PLUGINS := github.com/launchrctl/compose@v0.9.2,github.com/launchrctl/keyring@v0.2.3,github.com/launchrctl/launchr@v0.14.1,github.com/launchrctl/web@v0.7.0,github.com/skilld-labs/plasmactl-bump@v1.8.0,github.com/skilld-labs/plasmactl-dependencies@v0.3.0,github.com/skilld-labs/plasmactl-meta@v0.9.0,github.com/skilld-labs/plasmactl-package@v1.1.0,github.com/skilld-labs/plasmactl-publish@v1.3.2,github.com/skilld-labs/plasmactl-update@v0.2.2
+TARGET_PLUGINS := github.com/launchrctl/compose@v0.9.3,github.com/launchrctl/keyring@v0.2.4,github.com/launchrctl/launchr@v0.16.1,github.com/launchrctl/web@v0.8.0,github.com/skilld-labs/plasmactl-bump@v1.9.0,github.com/skilld-labs/plasmactl-dependencies@v0.3.0,github.com/skilld-labs/plasmactl-meta@v0.10.1,github.com/skilld-labs/plasmactl-package@v1.1.0,github.com/skilld-labs/plasmactl-publish@v1.3.2,github.com/skilld-labs/plasmactl-update@v0.2.2
 PLASMACTL_ARTIFACT_REPOSITORY_URL := repositories.skilld.cloud
 PLASMACTL_ARTIFACT_REPOSITORY_RAW_NAME := pla-plasmactl-raw
 PLASMACTL_ARTIFACT_REPOSITORY_USER_NAME := pla-plasmactl
@@ -78,7 +78,7 @@ build:
 		$(if $(filter windows,$(TARGET_OS)), $(eval EXTENSION := .exe)) \
 		$(foreach TARGET_ARCH,$(TARGET_ARCHES), \
 			echo "Compiling artifact plasmactl_${TARGET_OS}_${TARGET_ARCH}${EXTENSION}..." ; \
-			GOOS=${TARGET_OS} GOARCH=${TARGET_ARCH} ./${BINARY_NAME} build -vvv --tag nethttpomithttp2 -p ${TARGET_PLUGINS} -n plasmactl -o plasmactl_${TARGET_OS}_${TARGET_ARCH}${EXTENSION} --build-version ${TARGET_VERSION} 2>&1 | tee ${BUILD_LOG_FILE} ; \
+			GOOS=${TARGET_OS} GOARCH=${TARGET_ARCH} ./${BINARY_NAME} build --timeout 500s -r google.golang.org/genproto=google.golang.org/genproto@latest -vvv --tag nethttpomithttp2 -p ${TARGET_PLUGINS} -n plasmactl -o plasmactl_${TARGET_OS}_${TARGET_ARCH}${EXTENSION} --build-version ${TARGET_VERSION} 2>&1 | tee ${BUILD_LOG_FILE} ; \
 		) \
 	)
 	@echo "-- Artifacts generated:"
