@@ -2,9 +2,9 @@ include helpers/*.mk
 BINARY_REPO := github.com/launchrctl/launchr
 BINARY_URL := https://${BINARY_REPO}
 ifeq ($(UNAME_P),unknown)
-BINARY_NAME := plasmactl
+BINARY_NAME := launchr_${UNAME_S}_x86_64
 else
-BINARY_NAME := plasmactl
+BINARY_NAME := launchr_${UNAME_S}_${UNAME_P}
 endif
 LAUNCHR_BINARY_CHECKSUM_EXPECTED := $(shell curl -sL ${BINARY_URL}/releases/latest/download/checksums.txt | grep "${BINARY_NAME}" | awk '{print $$1}')
 LAUNCHR_BINARY_RELEASE_VERSION := $(shell curl -s https://api.github.com/repos/launchrctl/launchr/releases/latest | grep '"tag_name":' | sed -E 's/.*"([^"]+)".*/\1/')
@@ -15,7 +15,7 @@ TARGET_PLUGINS := github.com/launchrctl/compose@v0.14.0,github.com/launchrctl/ke
 PLASMACTL_ARTIFACT_REPOSITORY_URL := repositories.skilld.cloud
 PLASMACTL_ARTIFACT_REPOSITORY_RAW_NAME := pla-plasmactl-raw
 PLASMACTL_ARTIFACT_REPOSITORY_USER_NAME := pla-plasmactl
-PLASMACTL_BINARY_NAME := plasmactl
+PLASMACTL_BINARY_NAME := plasmactl_${UNAME_S}_${UNAME_P}
 BUILD_LOG_FILE := build.log
 BUILD_LOG_FILTER := "^go: added github.com/launchrctl/\|^go: added github.com/skilld-labs/"
 BUILD_LOG_STRING_TR := $(shell echo "sed 's|^go: added ||g' | sed 's|.*github.com/||g' | sed 's|^|plugin |g' | sed 's|/| |g'")
@@ -40,7 +40,7 @@ evaluate_remote_stable_release:
 
 .PHONY: binaries
 ## Sequentially: check provision build push clean
-binaries: build push pin validate clean
+binaries: xx check provision build push pin validate clean
 
 
 .PHONY: check
