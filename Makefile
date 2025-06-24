@@ -1,24 +1,32 @@
 include helpers/*.mk
+
 BINARY_REPO := github.com/launchrctl/launchr
 BINARY_URL := https://${BINARY_REPO}
+
 ifeq ($(UNAME_P),unknown)
 BINARY_NAME := launchr_${UNAME_S}_x86_64
 else
 BINARY_NAME := launchr_${UNAME_S}_${UNAME_P}
 endif
+
 LAUNCHR_BINARY_CHECKSUM_EXPECTED := $(shell curl -sL ${BINARY_URL}/releases/latest/download/checksums.txt | grep "${BINARY_NAME}" | awk '{print $$1}')
 LAUNCHR_BINARY_RELEASE_VERSION := $(shell curl -s https://api.github.com/repos/launchrctl/launchr/releases/latest | grep '"tag_name":' | sed -E 's/.*"([^"]+)".*/\1/')
-TARGET_OSES := darwin linux windows
-TARGET_ARCHES := amd64 arm64 386
+
+TARGET_OSES := Darwin Linux Windows
+TARGET_ARCHES := amd64 arm64
+
 TARGET_VERSION :=
-TARGET_PLUGINS := github.com/launchrctl/compose@v0.15.1,github.com/launchrctl/keyring@v0.6.0,github.com/launchrctl/launchr@v0.21.1,github.com/launchrctl/web@v0.16.0,github.com/skilld-labs/plasmactl-bump/v2@v2.7.0,github.com/skilld-labs/plasmactl-dependencies@v0.5.0,github.com/skilld-labs/plasmactl-meta@v0.16.3,github.com/skilld-labs/plasmactl-package@v1.2.1,github.com/skilld-labs/plasmactl-publish@v1.4.1,github.com/skilld-labs/plasmactl-release@v1.1.1,github.com/skilld-labs/plasmactl-update@v1.0.1
+TARGET_PLUGINS := github.com/launchrctl/compose@v0.15.1,github.com/launchrctl/keyring@v0.6.1,github.com/launchrctl/launchr@v0.21.1,github.com/launchrctl/web@v0.16.0,github.com/skilld-labs/plasmactl-bump/v2@v2.8.0,github.com/skilld-labs/plasmactl-dependencies@v0.5.0,github.com/skilld-labs/plasmactl-meta@v0.16.3,github.com/skilld-labs/plasmactl-package@v1.2.1,github.com/skilld-labs/plasmactl-publish@v1.4.1,github.com/skilld-labs/plasmactl-release@v1.2.0,github.com/skilld-labs/plasmactl-update@v1.1.0
+
 PLASMACTL_ARTIFACT_REPOSITORY_URL := repositories.skilld.cloud
 PLASMACTL_ARTIFACT_REPOSITORY_RAW_NAME := pla-plasmactl-raw
 PLASMACTL_ARTIFACT_REPOSITORY_USER_NAME := pla-plasmactl
 PLASMACTL_BINARY_NAME := plasmactl_${UNAME_S}_${UNAME_P}
+
 BUILD_LOG_FILE := build.log
 BUILD_LOG_FILTER := "^go: added github.com/launchrctl/\|^go: added github.com/skilld-labs/"
 BUILD_LOG_STRING_TR := $(shell echo "sed 's|^go: added ||g' | sed 's|.*github.com/||g' | sed 's|^|plugin |g' | sed 's|/| |g'")
+
 STABLE_RELEASE_FILE_NAME := stable_release
 REMOTE_STABLE_RELEASE := $(shell echo "Deferred evaluation")
 
@@ -41,7 +49,6 @@ evaluate_remote_stable_release:
 .PHONY: binaries
 ## Sequentially: check provision build push clean
 binaries: xx check provision build push pin validate clean
-
 
 .PHONY: check
 ## Various pre-run checks
@@ -66,6 +73,10 @@ provision:
 	@echo "-- Comparing checksums..."
 	echo '${LAUNCHR_BINARY_CHECKSUM_EXPECTED} ${BINARY_NAME}' | sha256sum --check
 	chmod +x ${BINARY_NAME}
+	@echo "-- Building binary with update plugin to pass config..."
+	./${BINARY_NAME} build --no-cache --timeout 500s -vvv --tag nethttpomithttp2 -p github.com/skilld-labs/plasmactl-update@latest -n plasmactl -o ${BINARY_NAME} --build-version ${LAUNCHR_BINARY_RELEASE_VERSION}
+	@echo "-- Writing config file for update plugin..."
+	$(shell echo "repository_url: 'https://repositories.skilld.cloud/repository/pla-plasmactl-raw'" > launchr-update.yaml)
 	@echo "-- Done."
 	@echo
 
@@ -75,10 +86,13 @@ build:
 	@echo "- Action: build"
 	@echo "-- Building plasmactl (launchr + plugins) binaries compatible with multiple OS & Arch..."
 	$(foreach TARGET_OS,$(TARGET_OSES), \
-		$(if $(filter windows,$(TARGET_OS)), $(eval EXTENSION := .exe)) \
+		$(eval GOOS := $(shell echo $(TARGET_OS) | tr '[:upper:]' '[:lower:]')) \
+		$(eval EXTENSION :=) \
+		$(if $(filter Windows,$(TARGET_OS)), $(eval EXTENSION := .exe)) \
 		$(foreach TARGET_ARCH,$(TARGET_ARCHES), \
-			echo "Compiling artifact plasmactl_${TARGET_OS}_${TARGET_ARCH}${EXTENSION}..." ; \
-			GOOS=${TARGET_OS} GOARCH=${TARGET_ARCH} ./${BINARY_NAME} build --no-cache --timeout 500s -vvv --tag nethttpomithttp2 -p ${TARGET_PLUGINS} -n plasmactl -o plasmactl_${TARGET_OS}_${TARGET_ARCH}${EXTENSION} --build-version ${TARGET_VERSION} 2>&1 | tee ${BUILD_LOG_FILE} ; \
+			$(eval ARCH_NAME := $(if $(filter amd64,$(TARGET_ARCH)),x86_64,$(if $(filter arm64,$(TARGET_ARCH)),arm64,$(TARGET_ARCH)))) \
+			echo "Compiling artifact plasmactl_${TARGET_OS}_${ARCH_NAME}${EXTENSION}..." ; \
+			GOOS=$(GOOS) GOARCH=$(TARGET_ARCH) ./${BINARY_NAME} build --no-cache --timeout 500s -vvv --tag nethttpomithttp2 -p ${TARGET_PLUGINS} -n plasmactl -o "plasmactl_${TARGET_OS}_${ARCH_NAME}${EXTENSION}" --build-version ${TARGET_VERSION} 2>&1 | tee ${BUILD_LOG_FILE} ; \
 		) \
 	)
 	@echo "-- Artifacts generated:"
@@ -93,7 +107,7 @@ build:
 ## Upload plasmactl binaries artifacts to Nexus repository
 push:
 	@echo "- Action: push"
-	@echo "-- Pushing platmactl binaries to https://${PLASMACTL_ARTIFACT_REPOSITORY_URL}/#browse/browse:${PLASMACTL_ARTIFACT_REPOSITORY_RAW_NAME}..."
+	@echo "-- Pushing plasmactl binaries to https://${PLASMACTL_ARTIFACT_REPOSITORY_URL}/#browse/browse:${PLASMACTL_ARTIFACT_REPOSITORY_RAW_NAME}..."
 	$(if $(PLASMACTL_ARTIFACT_REPOSITORY_USER_PW),,$(error PLASMACTL_ARTIFACT_REPOSITORY_USER_PW is not set: You need to pass it as make command argument))
 	$(eval ARTIFACT_BINARIES = $(shell ls plasmactl_*))
 	$(if $(ARTIFACT_BINARIES),,$(error No artifact binary file found in current directory (plasmactl_*)))
@@ -142,4 +156,3 @@ getplasmactl:
 	@curl -kL --keepalive-time 30 --retry 20 --retry-all-errors -s --user '${PLASMACTL_ARTIFACT_REPOSITORY_USER_NAME}:${PLASMACTL_ARTIFACT_REPOSITORY_USER_PW}' --upload-file '${FILE_NAME}' https://${PLASMACTL_ARTIFACT_REPOSITORY_URL}/repository/${PLASMACTL_ARTIFACT_REPOSITORY_RAW_NAME}/${FILE_NAME}
 	@echo "-- Done."
 	@echo
-

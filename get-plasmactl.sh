@@ -3,10 +3,10 @@ set -e
 #set -x
 
 # Get the operating system type
-os=$(uname -s)
+os_raw=$(uname -s)
 
 # Get the machine architecture
-arch=$(uname -m)
+arch_raw=$(uname -m)
 
 # Define the URL pattern for the file
 baseurl="https://repositories.skilld.cloud/repository/pla-plasmactl-raw"
@@ -39,7 +39,7 @@ output() {
         style_start="$(printf '\033[31;31m')"
         style_end="$(printf '\033[0m')"
         ;;
-      "info" | "warning")
+      "info"|"warning")
         style_start="$(printf '\033[33m')"
         style_end="$(printf '\033[39m')"
         ;;
@@ -54,7 +54,7 @@ output() {
     esac
   fi
 
-  printf "%b%s%b\\n" "${style_start}" "$1" "${style_end}"
+  printf "%b%s%b\n" "${style_start}" "$1" "${style_end}"
 }
 
 exit_with_error() {
@@ -83,10 +83,10 @@ init_sudo() {
     return
   fi
 
-  if command -v doas > /dev/null 2>&1; then
+  if command -v doas >/dev/null 2>&1; then
     has_sudo=true
     cmd_sudo='doas'
-  elif command -v sudo > /dev/null 2>&1; then
+  elif command -v sudo >/dev/null 2>&1; then
     has_sudo=true
     cmd_sudo='sudo'
   fi
@@ -124,10 +124,9 @@ call_user() {
 add_footer_note() {
   for var in "$@"; do
     if [ -n "$footer_notes" ]; then
-      footer_notes="${footer_notes}
-${var}"
+      footer_notes="${footer_notes}\n${var}"
     else
-      footer_notes="${footer_notes}${var}"
+      footer_notes="${var}"
     fi
   done
 }
@@ -144,37 +143,33 @@ validate_credentials() {
 }
 
 # Determine the appropriate values for 'os', 'arch' and 'extension'
-case $os in
+extension=""
+case "$os_raw" in
   Linux*)
-    os="linux"
-    extension=""
+    os="Linux"
     ;;
   Darwin*)
-    os="darwin"
-    extension=""
+    os="Darwin"
     ;;
-  CYGWIN* | MINGW32* | MSYS* | MINGW*)
-    os="windows"
+  CYGWIN*|MINGW32*|MSYS*|MINGW*|Windows*)
+    os="Windows"
     extension=".exe"
     ;;
   *)
-    output "Unsupported operating system: $os" "error"
+    output "Unsupported operating system: $os_raw" "error"
     exit 1
     ;;
 esac
 
-case $arch in
-  x86_64 | amd64)
-    arch="amd64"
+case "$arch_raw" in
+  x86_64|amd64)
+    arch="x86_64"
     ;;
-  i?86 | x86)
-    arch="386"
-    ;;
-  arm64 | aarch64)
+  arm64|aarch64)
     arch="arm64"
     ;;
   *)
-    output "Unsupported architecture: $arch" "error"
+    output "Unsupported architecture: $arch_raw" "error"
     exit 1
     ;;
 esac
@@ -188,16 +183,15 @@ if [ $# -eq 2 ]; then
   username="$1"
   password="$2"
 else
-  # Prompt user for username and password
   output "Enter your Skilld.cloud credentials:"
   read -p "Username: " username
   read -sp "Password: " password
   output ""
 fi
 
-stable_release_url=$(echo "${baseurl}/${release_path}")
+stable_release_url=$(printf "%s/%s" "$baseurl" "$release_path")
 # Check the validity of the credentials
-http_code=$(validate_credentials "$username" "$password" "${stable_release_url}")
+http_code=$(validate_credentials "$username" "$password" "$stable_release_url")
 if [ -z "$http_code" ]; then
   output "Error: Failed to validate credentials. Access denied." "error"
   exit 1
@@ -216,9 +210,9 @@ fi
 
 # Get value of stable_release
 if command -v curl >/dev/null 2>&1; then
-  stable_release=$(curl -sS -u "$username:$password" -X GET "${stable_release_url}" | tr -d '\n')
+  stable_release=$(curl -sS -u "$username:$password" -X GET "$stable_release_url" | tr -d '\n')
 elif command -v wget >/dev/null 2>&1; then
-  stable_release=$(wget -q --user="$username" --password="$password" "${stable_release_url}" -O - | tr -d '\n')
+  stable_release=$(wget -q --user="$username" --password="$password" "$stable_release_url" -O - | tr -d '\n')
 else
   output "Neither curl nor wget were found. Please install one of them." "error"
   exit 1
@@ -244,7 +238,7 @@ tempbinaryname=$(basename "$url")
 binaryname="plasmactl${extension}"
 
 if [ ! -e "${tempbinaryname}" ]; then
-  output "File ${binaryname} does not exist." "error"
+  output "File ${tempbinaryname} does not exist." "error"
   exit 1
 fi
 output "Renaming file ${tempbinaryname} to ${binaryname}"
@@ -252,14 +246,14 @@ mv "${tempbinaryname}" "${binaryname}"
 chmod +x "${binaryname}"
 
 # Installing binary
-if echo $PATH | grep "$HOME/.global/bin" > /dev/null; then
+if echo $PATH | grep "$HOME/.global/bin" >/dev/null; then
   dirpath="$HOME/.global/bin"
-elif echo $PATH | grep "$HOME/.local/bin" > /dev/null; then
+elif echo $PATH | grep "$HOME/.local/bin" >/dev/null; then
   dirpath="$HOME/.local/bin"
-elif echo $PATH | grep "/usr/local/bin" > /dev/null; then
+elif echo $PATH | grep "/usr/local/bin" >/dev/null; then
   dirpath="/usr/local/bin"
 fi
-if [ -n "${dirpath}" ] && [ -n "${PATH+set}" ] && printf "%s" "$PATH" | grep "${dirpath}" > /dev/null; then # PATH is defined and includes dir where we can move binary
+if [ -n "${dirpath}" ] && [ -n "${PATH+set}" ] && printf "%s" "$PATH" | grep "${dirpath}" >/dev/null; then # PATH includes dir where we can move binary
   output "Installing ${binaryname} binary under ${dirpath}"
   call_try_user "mkdir -p ${dirpath}"
   call_try_user "mv ${binaryname} ${dirpath}" "Failed to move ${binaryname} to ${dirpath}"
@@ -270,17 +264,17 @@ else
   output "Moving ${binaryname} to ${dirpath}"
   mv "${binaryname}" "${dirpath}"
 
-  if ! printf "%s" "$PATH" | grep "${dirpath}" > /dev/null; then
+  if ! printf "%s" "$PATH" | grep "${dirpath}" >/dev/null; then
     output "${dirpath} is not in \$PATH." "warning"
     add_footer_note " ⚠ The directory \"${dirpath}/\" is not in \$PATH"
     if [ "$(basename $SHELL)" = "zsh" ]; then
-      if ! grep "export PATH=\"${dirpath}:\$PATH\"" "$HOME/.zshrc" > /dev/null; then
+      if ! grep "export PATH=\"${dirpath}:\$PATH\"" "$HOME/.zshrc" >/dev/null; then
         add_footer_note \
           "   Run this command to add the directory to your PATH:" \
           "   echo 'export PATH=\"${dirpath}:\$PATH\"' >> \$HOME/.zshrc && . \$HOME/.zshrc"
       fi
     elif [ "$(basename $SHELL)" = "bash" ]; then
-      if ! grep "export PATH=\"${dirpath}:\$PATH\"" "$HOME/.bashrc" > /dev/null; then
+      if ! grep "export PATH=\"${dirpath}:\$PATH\"" "$HOME/.bashrc" >/dev/null; then
         add_footer_note \
           "   Run this command to add the directory to your PATH:" \
           "   echo 'export PATH=\"${dirpath}:\$PATH\"' >> \$HOME/.bashrc && . \$HOME/.bashrc"
@@ -296,30 +290,32 @@ fi
 # Prepare commands autocompletion
 autocomplete_helper() {
   if [ -n "$SHELL" ]; then
-    if [ "$(basename $SHELL)" = "bash" ] || [ "$(basename $SHELL)" = "fish" ] || [ "$(basename $SHELL)" = "powershell" ] || [ "$(basename $SHELL)" = "zsh" ]; then
-      completion_script_name=completion_script
-      output "  - Run this command to add autocompletion:"
-      echo "    \"${binaryname} completion $(basename $SHELL) > ${completion_script_name} && source ${completion_script_name} && rm ${completion_script_name}\""
-    fi
+    case "$(basename $SHELL)" in
+      bash|fish|powershell|zsh)
+        completion_script_name=completion_script
+        output "  - Run this command to add autocompletion:" "info"
+        echo "    \"${binaryname} completion $(basename $SHELL) > ${completion_script_name} && source ${completion_script_name} && rm ${completion_script_name}\""
+        ;;
+    esac
   fi
 }
 # Outro
 output "plasmactl has been installed successfully." "success"
-if command -v "${binaryname}" > /dev/null 2>&1; then
-output ""
-"${binaryname}" --version
+if command -v "${binaryname}" >/dev/null 2>&1; then
+  output ""
+  "${binaryname}" --version
 fi
 output ""
 output "What's next?" "heading"
 autocomplete_helper
-output "  - To use the CLI, run: plasmactl" "output"
+output "  - To use the CLI, run: plasmactl" "info"
 output ""
 output "Useful links:" "heading"
-output "  - CLI introduction: https://projects.skilld.cloud/skilld/pla-plasmactl/-/blob/master/README.md"
+output "  - CLI introduction: https://projects.skilld.cloud/skilld/pla-plasmactl/-/blob/master/README.md" "info"
 if [ -n "$footer_notes" ]; then
-output ""
-output "Warning during installation:" "heading"
-output "$footer_notes" "warning"
+  output ""
+  output "Warning during installation:" "heading"
+  output "$footer_notes" "warning"
 fi
 output ""
 
