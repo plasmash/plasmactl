@@ -25,6 +25,7 @@ trap 'rm -f "$pipe"' EXIT
 # Avoid unbounded variable
 has_sudo=""
 footer_notes=""
+override_install_dir=""
 
 output() {
   style_start=""
@@ -178,6 +179,13 @@ esac
 
 output "Starting plasmactl installation..." "success"
 
+# If plasmactl is already installed, grab its directory to reuse
+if command -v plasmactl >/dev/null 2>&1; then
+  existing_path=$(command -v plasmactl)
+  override_install_dir=$(dirname "$existing_path")
+  output "Found existing plasmactl at ${existing_path}, will install to ${override_install_dir}" "info"
+fi
+
 # Check if username and password are passed as script arguments
 if [ $# -eq 2 ]; then
   username="$1"
@@ -245,15 +253,21 @@ output "Renaming file ${tempbinaryname} to ${binaryname}"
 mv "${tempbinaryname}" "${binaryname}"
 chmod +x "${binaryname}"
 
-# Installing binary
-if echo $PATH | grep "$HOME/.global/bin" >/dev/null; then
-  dirpath="$HOME/.global/bin"
-elif echo $PATH | grep "$HOME/.local/bin" >/dev/null; then
-  dirpath="$HOME/.local/bin"
-elif echo $PATH | grep "/usr/local/bin" >/dev/null; then
-  dirpath="/usr/local/bin"
+# Installing binary (reuse existing dir if detected)
+if [ -n "${override_install_dir}" ]; then
+  dirpath="${override_install_dir}"
+  output "Installing ${binaryname} into existing directory ${dirpath}"
+else
+  if echo $PATH | grep "$HOME/.global/bin" >/dev/null; then
+    dirpath="$HOME/.global/bin"
+  elif echo $PATH | grep "$HOME/.local/bin" >/dev/null; then
+    dirpath="$HOME/.local/bin"
+  elif echo $PATH | grep "/usr/local/bin" >/dev/null; then
+    dirpath="/usr/local/bin"
+  fi
 fi
-if [ -n "${dirpath}" ] && [ -n "${PATH+set}" ] && printf "%s" "$PATH" | grep "${dirpath}" >/dev/null; then # PATH includes dir where we can move binary
+
+if [ -n "${dirpath}" ] && [ -n "${PATH+set}" ] && printf "%s" "$PATH" | grep "${dirpath}" >/dev/null; then
   output "Installing ${binaryname} binary under ${dirpath}"
   call_try_user "mkdir -p ${dirpath}"
   call_try_user "mv ${binaryname} ${dirpath}" "Failed to move ${binaryname} to ${dirpath}"
@@ -318,5 +332,4 @@ if [ -n "$footer_notes" ]; then
   output "$footer_notes" "warning"
 fi
 output ""
-
 

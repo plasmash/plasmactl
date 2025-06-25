@@ -41,7 +41,6 @@ push get-plasmactl script:
       changes:
         paths:
           - get-plasmactl.sh
-        compare_to: 'master' # https://gitlab.com/gitlab-org/gitlab/-/issues/369916
 
 
 push plasmactl artifacts:
