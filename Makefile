@@ -16,7 +16,7 @@ TARGET_OSES := Darwin Linux Windows
 TARGET_ARCHES := amd64 arm64
 
 TARGET_VERSION :=
-TARGET_PLUGINS := github.com/launchrctl/compose@v0.15.1,github.com/launchrctl/keyring@v0.6.1,github.com/launchrctl/launchr@v0.21.1,github.com/launchrctl/web@v0.16.0,github.com/skilld-labs/plasmactl-bump/v2@v2.8.0,github.com/skilld-labs/plasmactl-dependencies@v0.5.0,github.com/skilld-labs/plasmactl-meta@v0.16.3,github.com/skilld-labs/plasmactl-package@v1.2.1,github.com/skilld-labs/plasmactl-publish@v1.4.1,github.com/skilld-labs/plasmactl-release@v1.2.0,github.com/skilld-labs/plasmactl-update@v1.1.0
+TARGET_PLUGINS := github.com/launchrctl/compose@v0.15.1,github.com/launchrctl/keyring@v0.6.1,github.com/launchrctl/launchr@v0.21.1,github.com/launchrctl/web@v0.16.0,github.com/skilld-labs/plasmactl-bump/v2@v2.8.0,github.com/skilld-labs/plasmactl-meta@v0.16.3,github.com/skilld-labs/plasmactl-package@v1.2.1,github.com/skilld-labs/plasmactl-publish@v1.4.1,github.com/skilld-labs/plasmactl-release@v1.2.0,github.com/skilld-labs/plasmactl-update@v1.1.0
 
 PLASMACTL_ARTIFACT_REPOSITORY_URL := repositories.skilld.cloud
 PLASMACTL_ARTIFACT_REPOSITORY_RAW_NAME := pla-plasmactl-raw
