@@ -1,4 +1,5 @@
 include helpers/*.mk
+include plugins.mk
 
 BINARY_REPO := github.com/launchrctl/launchr
 BINARY_URL := https://${BINARY_REPO}
@@ -16,7 +17,10 @@ TARGET_OSES := Darwin Linux Windows
 TARGET_ARCHES := amd64 arm64
 
 TARGET_VERSION :=
-TARGET_PLUGINS := github.com/launchrctl/compose@v0.15.1,github.com/launchrctl/keyring@v0.6.1,github.com/launchrctl/launchr@v0.21.1,github.com/launchrctl/web@v0.16.0,github.com/skilld-labs/plasmactl-bump/v2@v2.8.0,github.com/skilld-labs/plasmactl-meta@v0.16.3,github.com/skilld-labs/plasmactl-package@v1.2.1,github.com/skilld-labs/plasmactl-publish@v1.4.1,github.com/skilld-labs/plasmactl-release@v1.2.0,github.com/skilld-labs/plasmactl-update@v1.1.0
+empty  :=
+space  := $(empty) $(empty)
+comma  := ,
+TARGET_PLUGINS := $(subst $(space),$(comma),$(PLUGIN_LIST))
 
 PLASMACTL_ARTIFACT_REPOSITORY_URL := repositories.skilld.cloud
 PLASMACTL_ARTIFACT_REPOSITORY_RAW_NAME := pla-plasmactl-raw
@@ -48,7 +52,7 @@ evaluate_remote_stable_release:
 
 .PHONY: binaries
 ## Sequentially: check provision build push clean
-binaries: xx check provision build push pin validate clean
+binaries: xx check provision build legacy-naming push pin validate clean
 
 .PHONY: check
 ## Various pre-run checks
@@ -99,6 +103,27 @@ build:
 	@ls -lah | grep plasmactl_
 	@grep ${BUILD_LOG_FILTER} $(BUILD_LOG_FILE) | ${BUILD_LOG_STRING_TR} | while IFS= read -r line; do \
 		touch "$${line}"; \
+	done
+	@echo "-- Done."
+	@echo
+
+SRC_BINS := \
+  plasmactl_Darwin_arm64       \
+  plasmactl_Darwin_x86_64      \
+  plasmactl_Linux_arm64        \
+  plasmactl_Linux_x86_64       \
+  plasmactl_Windows_arm64.exe  \
+  plasmactl_Windows_x86_64.exe
+.PHONY: legacy-naming
+legacy-naming: $(SRC_BINS)
+	@echo "-- Also creating binaries with old backward-compatible naming:"
+	@for f in $(SRC_BINS); do \
+	  dst=$$(echo "$$f" | tr '[:upper:]' '[:lower:]'); \
+	  if echo "$$dst" | grep -q 'x86_64'; then \
+	    dst=$$(echo "$$dst" | sed 's/x86_64/amd64/'); \
+	  fi; \
+	  echo "Copying $$f → $$dst"; \
+	  cp "$$f" "$$dst"; \
 	done
 	@echo "-- Done."
 	@echo

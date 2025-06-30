@@ -9,3 +9,4 @@ build.log
 plugin*
 stable_release
 .plasmactl/
+!plugins.mk
