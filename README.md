@@ -4,9 +4,9 @@
 
 ## What ?
 
-- [Launchrctl](https://github.com/launchrctl/launchr) + plugins ([compose](https://github.com/launchrctl/compose) + [keyring](https://github.com/launchrctl/keyring) + [components-bump](https://github.com/skilld-labs/components-bump)) = **plasmactl**
+- [Launchrctl](https://github.com/launchrctl/launchr) + [Core plugins](https://github.com/launchrctl#org-repositories) + [Plasma/Skilld plugins](https://github.com/skilld-labs?q=plasmactl&type=all&language=&sort=#org-repositories) = **Plasmactl**
 
-## How ?
+## How to install ?
 
 - Execute this one-liner command:
 ```
@@ -14,3 +14,9 @@ echo "Enter your Skilld.cloud credentials:" && echo -n "Username: " && read user
 ```
 - Fill your Skilld platform credentials when prompted
 
+## How to update ?
+
+- Execute:
+```
+plasmacl update
+```
