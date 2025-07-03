@@ -1,0 +1,19 @@
+working_directory: "{{ .current_working_dir }}"
+action:
+  title: Check plugins release
+  description: Use Github API to visualize which Github repo needs a new release and needs to be updated in plugins.mk file
+  alias:
+    - check
+
+runtime:
+  type: container
+  image: checkpluginsrelease:latest
+  build:
+    context: ./
+    args:
+      USER_ID: {{ .current_uid }}
+      GROUP_ID: {{ .current_gid }}
+      USER_NAME: launchr
+  command:
+    - bash
+    - /action/main.sh

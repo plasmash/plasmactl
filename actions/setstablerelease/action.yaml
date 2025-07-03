@@ -1,0 +1,19 @@
+working_directory: "{{ .current_working_dir }}"
+action:
+  title: Set stable release
+  description: Update stable_release content to pin a specific version as latest plasmactl release
+  alias:
+    - set
+
+runtime:
+  type: container
+  image: setstablerelease:latest
+  build:
+    context: ./
+    args:
+      USER_ID: {{ .current_uid }}
+      GROUP_ID: {{ .current_gid }}
+      USER_NAME: launchr
+  command:
+    - sh
+    - /action/main.sh
