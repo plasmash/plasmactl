@@ -4,7 +4,7 @@
 
 ## What ?
 
-- [Launchrctl](https://github.com/launchrctl/launchr) + [Core plugins](https://github.com/launchrctl#org-repositories) + [Plasma/Skilld plugins](https://github.com/skilld-labs?q=plasmactl&type=all&language=&sort=#org-repositories) = **Plasmactl**
+- [Launchrctl](https://github.com/launchrctl/launchr) + [Core plugins](https://github.com/launchrctl#org-repositories) + [Plasma/Skilld plugins](https://github.com/skilld-labs?q=plasmactl&type=all&language=&sort=#org-repositories) + Locally discovered actions = **Plasmactl**
 
 ## How to install ?
 
