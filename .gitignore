@@ -10,3 +10,4 @@ plugin*
 stable_release
 .plasmactl/
 !plugins.mk
+.idea

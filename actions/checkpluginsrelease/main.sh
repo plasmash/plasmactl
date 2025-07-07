@@ -81,7 +81,7 @@ for repo in "${sorted_repos[@]}"; do
 done
 
 # Extract local tags from the plugins.mk file
-PLUGINS_FILE="$HOME/Sources/pla-plasmactl/plugins.mk"
+PLUGINS_FILE="./plugins.mk"
 echo "Extracting local tags from ${PLUGINS_FILE}..."
 while read -r line; do
     # Skip empty lines and lines that don't contain @
