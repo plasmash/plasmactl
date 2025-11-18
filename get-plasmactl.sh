@@ -297,7 +297,7 @@ autocomplete_helper
 output "  - To use the CLI, run: plasmactl" "info"
 output ""
 output "Useful links:" "heading"
-output "  - CLI documentation: https://github.com/plasmash/plasmactl/blob/main/README.md" "info"
+output "  - CLI documentation: https://github.com/plasmash/plasmactl/blob/master/README.md" "info"
 output "  - Plasma platform: https://plasma.sh" "info"
 if [ -n "$footer_notes" ]; then
   output ""
