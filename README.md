@@ -69,7 +69,7 @@ plasmactl --help
 ### Common Commands
 
 - `plasmactl bump` - Bump component versions
-- `plasmactl meta` - Deploy platform components
+- `plasmactl ship` - Deploy platform components
 - `plasmactl compose` - Manage package composition
 - `plasmactl update` - Update plasmactl to the latest version
 
@@ -85,7 +85,7 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 
 ## License
 
-This project is part of the Plasma platform ecosystem and follows the same licensing terms.
+This project is licensed under the Apache License 2.0 - see the LICENSE file for details.
 
 ## Support
 
