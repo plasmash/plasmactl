@@ -8,10 +8,9 @@ os_raw=$(uname -s)
 # Get the machine architecture
 arch_raw=$(uname -m)
 
-# Define the URL pattern for the file
-baseurl="https://repositories.skilld.cloud/repository/pla-plasmactl-raw"
-release_path="stable_release"
-binaries_path="%s/%s/plasmactl_%s_%s%s"
+# GitHub repository settings
+github_repo="plasmash/plasmactl"
+github_api_url="https://api.github.com/repos/${github_repo}/releases/latest"
 
 # Create a log file where every output will be piped to
 : "${LOG_FILE:=/tmp/get-plasmactl-$(date '+%Y%m%d-%H%M%S').log}"
@@ -63,8 +62,8 @@ exit_with_error() {
   output "Installation failed" "error"
   output ""
   output "Get help with your plasmactl setup:" "heading"
-  output "- https://im.skilld.cloud/group/pla-plasmactl.client" "heading"
-  output "- https://im.skilld.cloud/group/pla-plasmactl.prod" "heading"
+  output "- https://github.com/plasmash/plasmactl/issues" "heading"
+  output "- https://plasma.sh" "heading"
   output ""
   output "Log file: ${LOG_FILE}"
   output ""
@@ -132,17 +131,6 @@ add_footer_note() {
   done
 }
 
-# Function to validate the credentials and return HTTP status code
-validate_credentials() {
-  local username="$1"
-  local password="$2"
-  local url="$3"
-
-  # Perform the credential validation by making a curl request and retrieving the HTTP status code
-  http_code=$(curl -s -o /dev/null -w "%{http_code}" -u "$username:$password" "$url")
-  echo "$http_code"
-}
-
 # Determine the appropriate values for 'os', 'arch' and 'extension'
 extension=""
 case "$os_raw" in
@@ -186,71 +174,55 @@ if command -v plasmactl >/dev/null 2>&1; then
   output "Found existing plasmactl at ${existing_path}, will install to ${override_install_dir}" "info"
 fi
 
-# Check if username and password are passed as script arguments
-if [ $# -eq 2 ]; then
-  username="$1"
-  password="$2"
-else
-  output "Enter your Skilld.cloud credentials:"
-  read -p "Username: " username
-  read -sp "Password: " password
-  output ""
-fi
-
-stable_release_url=$(printf "%s/%s" "$baseurl" "$release_path")
-# Check the validity of the credentials
-http_code=$(validate_credentials "$username" "$password" "$stable_release_url")
-if [ -z "$http_code" ]; then
-  output "Error: Failed to validate credentials. Access denied." "error"
-  exit 1
-elif [ "$http_code" -eq 200 ]; then
-  output "Valid credentials. Access granted."
-elif [ "$http_code" -eq 401 ]; then
-  output "Error: HTTP $http_code: Unauthorized. Credentials seem to be invalid." "error"
-  exit 1
-elif [ "$http_code" -eq 404 ]; then
-  output "Error: HTTP $http_code: Not Found. File ${stable_release_url} does not exist." "error"
-  exit 1
-else
-  output "Error: HTTP $http_code. An issue appeared while trying to validate credentials against ${stable_release_url}." "error"
-  exit 1
-fi
-
-# Get value of stable_release
+# Fetch latest release information from GitHub
+output "Fetching latest release information from GitHub..."
 if command -v curl >/dev/null 2>&1; then
-  stable_release=$(curl -sS -u "$username:$password" -X GET "$stable_release_url" | tr -d '\n')
+  release_data=$(curl -sS "${github_api_url}")
 elif command -v wget >/dev/null 2>&1; then
-  stable_release=$(wget -q --user="$username" --password="$password" "$stable_release_url" -O - | tr -d '\n')
+  release_data=$(wget -qO- "${github_api_url}")
 else
   output "Neither curl nor wget were found. Please install one of them." "error"
   exit 1
 fi
-output "Stable release: ${stable_release}"
 
-# Format the URL with the determined 'os', 'arch' and 'extension' values
-url=$(printf "$binaries_path" "$baseurl" "$stable_release" "$os" "$arch" "$extension")
+# Parse the release tag name
+release_tag=$(echo "$release_data" | grep '"tag_name":' | sed -E 's/.*"tag_name": "([^"]+)".*/\1/')
+if [ -z "$release_tag" ]; then
+  output "Error: Could not determine latest release version." "error"
+  exit 1
+fi
+output "Latest release: ${release_tag}"
+
+# Construct the binary filename and download URL
+binary_filename="plasmactl_${os}_${arch}${extension}"
+url="https://github.com/${github_repo}/releases/download/${release_tag}/${binary_filename}"
 output "Downloading file: ${url}"
 
-# Download the file using curl or wget with Basic Auth header
+# Download the file
 if command -v curl >/dev/null 2>&1; then
-  curl -sS -u "$username:$password" -O "$url"
+  if ! curl -sSL -o "${binary_filename}" "${url}"; then
+    output "Error: Failed to download ${url}" "error"
+    exit 1
+  fi
 elif command -v wget >/dev/null 2>&1; then
-  wget -q --user="$username" --password="$password" "$url"
+  if ! wget -q -O "${binary_filename}" "${url}"; then
+    output "Error: Failed to download ${url}" "error"
+    exit 1
+  fi
 else
   output "Neither curl nor wget were found. Please install one of them." "error"
   exit 1
 fi
 
-# Renaming downloaded file
-tempbinaryname=$(basename "$url")
+# Prepare the binary
 binaryname="plasmactl${extension}"
 
-if [ ! -e "${tempbinaryname}" ]; then
-  output "File ${tempbinaryname} does not exist." "error"
+if [ ! -e "${binary_filename}" ]; then
+  output "File ${binary_filename} does not exist." "error"
   exit 1
 fi
-output "Renaming file ${tempbinaryname} to ${binaryname}"
-mv "${tempbinaryname}" "${binaryname}"
+output "Renaming file ${binary_filename} to ${binaryname}"
+mv "${binary_filename}" "${binaryname}"
 chmod +x "${binaryname}"
 
 # Installing binary (reuse existing dir if detected)
@@ -325,7 +297,8 @@ autocomplete_helper
 output "  - To use the CLI, run: plasmactl" "info"
 output ""
 output "Useful links:" "heading"
-output "  - CLI introduction: https://projects.skilld.cloud/skilld/pla-plasmactl/-/blob/master/README.md" "info"
+output "  - CLI documentation: https://github.com/plasmash/plasmactl/blob/main/README.md" "info"
+output "  - Plasma platform: https://plasma.sh" "info"
 if [ -n "$footer_notes" ]; then
   output ""
   output "Warning during installation:" "heading"
