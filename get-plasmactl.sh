@@ -167,9 +167,12 @@ esac
 
 output "Starting plasmactl installation..." "success"
 
+# Normalize HOME to remove any trailing slash
+HOME="${HOME%/}"
+
 # If plasmactl is already installed, grab its directory to reuse
 if command -v plasmactl >/dev/null 2>&1; then
-  existing_path=$(command -v plasmactl)
+  existing_path=$(command -v plasmactl | sed 's#//#/#g')
   override_install_dir=$(dirname "$existing_path")
   output "Found existing plasmactl at ${existing_path}, will install to ${override_install_dir}" "info"
 fi
