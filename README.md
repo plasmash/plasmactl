@@ -8,6 +8,10 @@ The CLI tool for Plasma platform management and operations.
 
 Plasmactl is the command-line interface for the [Plasma platform](https://plasma.sh) - an open-source real-time intelligence platform for enterprises, startups, and industries.
 
+## Requirements
+
+- **Docker**: Required for running container-based actions (prepare, deploy, release, etc.)
+
 ## Installation
 
 ### Quick Install (Recommended)
