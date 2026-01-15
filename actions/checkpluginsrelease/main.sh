@@ -8,13 +8,11 @@ repos=(
     "launchrctl/scaffold"
     "launchrctl/update"
     "launchrctl/web"
-    "skilld-labs/plasmactl-bump"
-    "skilld-labs/plasmactl-meta"
-    "skilld-labs/plasmactl-release"
+    "plasmash/plasmactl-package"
+    "plasmash/plasmactl-component"
+    "plasmash/plasmactl-platform"
+    "plasmash/plasmactl-processors"
 )
-#   Not used anymore:
-#   "skilld-labs/plasmactl-package"
-#   "skilld-labs/plasmactl-publish"
 
 # Sort the array alphabetically
 IFS=$'\n' sorted_repos=($(sort <<<"${repos[*]}"))
