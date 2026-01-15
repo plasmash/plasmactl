@@ -230,48 +230,56 @@ chmod +x "${binaryname}"
 
 # Installing binary (reuse existing dir if detected)
 if [ -n "${override_install_dir}" ]; then
+  # Existing plasmactl found - install to same directory
   dirpath="${override_install_dir}"
-  output "Installing ${binaryname} into existing directory ${dirpath}"
-else
-  if echo $PATH | grep "$HOME/.global/bin" >/dev/null; then
-    dirpath="$HOME/.global/bin"
-  elif echo $PATH | grep "$HOME/.local/bin" >/dev/null; then
-    dirpath="$HOME/.local/bin"
-  elif echo $PATH | grep "/usr/local/bin" >/dev/null; then
-    dirpath="/usr/local/bin"
-  fi
-fi
-
-if [ -n "${dirpath}" ] && [ -n "${PATH+set}" ] && printf "%s" "$PATH" | grep "${dirpath}" >/dev/null; then
   output "Installing ${binaryname} binary under ${dirpath}"
   call_try_user "mkdir -p ${dirpath}"
   call_try_user "mv ${binaryname} ${dirpath}" "Failed to move ${binaryname} to ${dirpath}"
-else
-  output "\$PATH does not contain ${dirpath}" # PATH is either undefined, empty or does not contain ${dirpath}
-  dirpath="$HOME/.plasmactl"
-  if [ ! -d "${dirpath}" ]; then mkdir -p "${dirpath}" && output "Creating ${dirpath} directory"; fi
-  output "Moving ${binaryname} to ${dirpath}"
-  mv "${binaryname}" "${dirpath}"
+elif [ -n "${PATH+set}" ]; then
+  # Find a suitable directory in PATH
+  dirpath=""
+  if echo "$PATH" | grep -E "(^|:)$HOME/\.global/bin(:|$)" >/dev/null 2>&1 || \
+     echo "$PATH" | grep -E "(^|:)$HOME//\.global/bin(:|$)" >/dev/null 2>&1; then
+    dirpath="$HOME/.global/bin"
+  elif echo "$PATH" | grep -E "(^|:)$HOME/\.local/bin(:|$)" >/dev/null 2>&1 || \
+       echo "$PATH" | grep -E "(^|:)$HOME//\.local/bin(:|$)" >/dev/null 2>&1; then
+    dirpath="$HOME/.local/bin"
+  elif echo "$PATH" | grep -E "(^|:)/usr/local/bin(:|$)" >/dev/null 2>&1; then
+    dirpath="/usr/local/bin"
+  fi
 
-  if ! printf "%s" "$PATH" | grep "${dirpath}" >/dev/null; then
-    output "${dirpath} is not in \$PATH." "warning"
-    add_footer_note " ⚠ The directory \"${dirpath}/\" is not in \$PATH"
-    if [ "$(basename $SHELL)" = "zsh" ]; then
-      if ! grep "export PATH=\"${dirpath}:\$PATH\"" "$HOME/.zshrc" >/dev/null; then
+  if [ -n "${dirpath}" ]; then
+    output "Installing ${binaryname} binary under ${dirpath}"
+    call_try_user "mkdir -p ${dirpath}"
+    call_try_user "mv ${binaryname} ${dirpath}" "Failed to move ${binaryname} to ${dirpath}"
+  else
+    # No suitable directory in PATH - use fallback
+    output "No suitable directory found in \$PATH"
+    dirpath="$HOME/.plasmactl"
+    if [ ! -d "${dirpath}" ]; then mkdir -p "${dirpath}" && output "Creating ${dirpath} directory"; fi
+    output "Moving ${binaryname} to ${dirpath}"
+    mv "${binaryname}" "${dirpath}"
+
+    if ! printf "%s" "$PATH" | grep "${dirpath}" >/dev/null; then
+      output "${dirpath} is not in \$PATH." "warning"
+      add_footer_note " ⚠ The directory \"${dirpath}/\" is not in \$PATH"
+      if [ "$(basename $SHELL)" = "zsh" ]; then
+        if ! grep "export PATH=\"${dirpath}:\$PATH\"" "$HOME/.zshrc" >/dev/null; then
+          add_footer_note \
+            "   Run this command to add the directory to your PATH:" \
+            "   echo 'export PATH=\"${dirpath}:\$PATH\"' >> \$HOME/.zshrc && . \$HOME/.zshrc"
+        fi
+      elif [ "$(basename $SHELL)" = "bash" ]; then
+        if ! grep "export PATH=\"${dirpath}:\$PATH\"" "$HOME/.bashrc" >/dev/null; then
+          add_footer_note \
+            "   Run this command to add the directory to your PATH:" \
+            "   echo 'export PATH=\"${dirpath}:\$PATH\"' >> \$HOME/.bashrc && . \$HOME/.bashrc"
+        fi
+      else
         add_footer_note \
-          "   Run this command to add the directory to your PATH:" \
-          "   echo 'export PATH=\"${dirpath}:\$PATH\"' >> \$HOME/.zshrc && . \$HOME/.zshrc"
+          "   You can add it to your PATH by adding this line at the end of your shell configuration file" \
+          "   export PATH=\"${dirpath}:\$PATH\""
       fi
-    elif [ "$(basename $SHELL)" = "bash" ]; then
-      if ! grep "export PATH=\"${dirpath}:\$PATH\"" "$HOME/.bashrc" >/dev/null; then
-        add_footer_note \
-          "   Run this command to add the directory to your PATH:" \
-          "   echo 'export PATH=\"${dirpath}:\$PATH\"' >> \$HOME/.bashrc && . \$HOME/.bashrc"
-      fi
-    else
-      add_footer_note \
-        "   You can add it to your PATH by adding this line at the end of your shell configuration file" \
-        "   export PATH=\"${dirpath}:\$PATH\""
     fi
   fi
 fi
