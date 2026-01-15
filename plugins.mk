@@ -6,5 +6,5 @@ PLUGIN_LIST := \
   github.com/launchrctl/update@v1.1.1 \
   github.com/launchrctl/web@v0.16.1 \
   github.com/plasmash/plasmactl-package@v1.0.0 \
-  github.com/plasmash/plasmactl-component@v1.0.0 \
-  github.com/plasmash/plasmactl-platform@v1.0.0
+  github.com/plasmash/plasmactl-component@v1.1.0 \
+  github.com/plasmash/plasmactl-platform@v1.1.0
