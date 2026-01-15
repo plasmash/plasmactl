@@ -22,13 +22,13 @@ space  := $(empty) $(empty)
 comma  := ,
 TARGET_PLUGINS := $(subst $(space),$(comma),$(PLUGIN_LIST))
 
-PLASMACTL_ARTIFACT_REPOSITORY_URL := repositories.skilld.cloud
-PLASMACTL_ARTIFACT_REPOSITORY_RAW_NAME := pla-plasmactl-raw
-PLASMACTL_ARTIFACT_REPOSITORY_USER_NAME := pla-plasmactl
+PLASMACTL_ARTIFACT_REPOSITORY_URL := github.com/plasmash/plasmactl
+PLASMACTL_ARTIFACT_REPOSITORY_RAW_NAME := releases
+PLASMACTL_ARTIFACT_REPOSITORY_USER_NAME := plasmash
 PLASMACTL_BINARY_NAME := plasmactl_${UNAME_S}_${UNAME_P}
 
 BUILD_LOG_FILE := build.log
-BUILD_LOG_FILTER := "^go: added github.com/launchrctl/\|^go: added github.com/skilld-labs/"
+BUILD_LOG_FILTER := "^go: added github.com/launchrctl/\|^go: added github.com/plasmash/"
 BUILD_LOG_STRING_TR := $(shell echo "sed 's|^go: added ||g' | sed 's|.*github.com/||g' | sed 's|^|plugin |g' | sed 's|/| |g'")
 
 STABLE_RELEASE_FILE_NAME := stable_release
@@ -78,9 +78,9 @@ provision:
 	echo '${LAUNCHR_BINARY_CHECKSUM_EXPECTED} ${BINARY_NAME}' | sha256sum --check
 	chmod +x ${BINARY_NAME}
 	@echo "-- Building binary with update plugin to pass config..."
-	./${BINARY_NAME} build --no-cache --timeout 500s -vvv --tag nethttpomithttp2 -p github.com/skilld-labs/plasmactl-update@latest -n plasmactl -o ${BINARY_NAME} --build-version ${LAUNCHR_BINARY_RELEASE_VERSION}
+	./${BINARY_NAME} build --no-cache --timeout 500s -vvv --tag nethttpomithttp2 -p github.com/launchrctl/update@v1.1.2 -n plasmactl -o ${BINARY_NAME} --build-version ${LAUNCHR_BINARY_RELEASE_VERSION}
 	@echo "-- Writing config file for update plugin..."
-	$(shell echo "repository_url: 'https://repositories.skilld.cloud/repository/pla-plasmactl-raw'" > launchr-update.yaml)
+	$(shell echo "repository_url: 'https://github.com/plasmash/plasmactl/releases/download'" > launchr-update.yaml)
 	@echo "-- Done."
 	@echo
 
