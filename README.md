@@ -1,6 +1,6 @@
 # Plasmactl
 
-Your CLI tool for Plasma platform management and operations.
+The CLI tool for Plasma platform management and operations.
 
 ## What is Plasmactl?
 
@@ -8,11 +8,9 @@ Your CLI tool for Plasma platform management and operations.
 
 Plasmactl is the command-line interface for the [Plasma platform](https://plasma.sh) - an open-source real-time intelligence platform for enterprises, startups, and industries.
 
-## How to Install
+## Installation
 
 ### Quick Install (Recommended)
-
-Execute this one-liner command:
 
 ```bash
 curl -sSL https://raw.githubusercontent.com/plasmash/plasmactl/master/get-plasmactl.sh | sh
@@ -31,32 +29,91 @@ curl -sSL https://raw.githubusercontent.com/plasmash/plasmactl/master/get-plasma
    ./get-plasmactl.sh
    ```
 
-3. Follow the on-screen instructions
-
 ### Verify Installation
 
 ```bash
 plasmactl --version
 ```
 
-## How to Update
+## Update
 
-Execute:
 ```bash
 plasmactl update
 ```
 
 ## Core Plugins
 
-Plasmactl extends its functionality through a modular plugin system:
+Plasmactl uses a modular plugin system with three core plugins:
 
-- [plasmactl-bump](https://github.com/plasmash/plasmactl-bump) - Version management for platform components
-- [plasmactl-compose](https://github.com/plasmash/plasmactl-compose) - Multi-package composition and orchestration
-- [plasmactl-package](https://github.com/plasmash/plasmactl-package) - Package building and management
-- [plasmactl-processors](https://github.com/plasmash/plasmactl-processors) - Data processing utilities
-- [plasmactl-publish](https://github.com/plasmash/plasmactl-publish) - Artifact publishing to repositories
-- [plasmactl-release](https://github.com/plasmash/plasmactl-release) - Release management and versioning
-- [plasmactl-ship](https://github.com/plasmash/plasmactl-ship) - Platform deployment and shipping
+| Plugin | Commands | Description |
+|--------|----------|-------------|
+| [plasmactl-package](https://github.com/plasmash/plasmactl-package) | `package:compose`, `package:add`, `package:update`, `package:delete` | Multi-package composition |
+| [plasmactl-component](https://github.com/plasmash/plasmactl-component) | `component:bump`, `component:sync`, `component:depend` | Version and dependency management |
+| [plasmactl-platform](https://github.com/plasmash/plasmactl-platform) | `platform:ship`, `platform:package`, `platform:publish`, `platform:release` | Platform lifecycle management |
+
+## Common Commands
+
+### Package Management
+
+```bash
+# Compose packages from dependencies
+plasmactl package:compose
+
+# Add a package dependency
+plasmactl package:add --package my-package --url https://github.com/org/repo.git --ref main
+```
+
+### Component Versioning
+
+```bash
+# Bump component versions after changes
+plasmactl component:bump
+
+# Propagate versions to dependencies
+plasmactl component:sync
+
+# Query component dependencies
+plasmactl component:depend platform.entities.person
+```
+
+### Platform Deployment
+
+```bash
+# Ship to an environment
+plasmactl platform:ship dev platform.interaction.observability
+
+# Create deployment artifact
+plasmactl platform:package
+
+# Publish artifact
+plasmactl platform:publish
+
+# Create release tag
+plasmactl platform:release
+```
+
+### Typical Workflow
+
+```bash
+# 1. Compose packages
+plasmactl package:compose
+
+# 2. Bump and sync versions
+plasmactl component:bump
+plasmactl component:sync
+
+# 3. Deploy to dev
+plasmactl platform:ship dev platform.interaction.observability
+```
+
+## Platform-Specific Actions
+
+Some actions are provided by the platform package itself (e.g., [plasma-core](https://github.com/plasmash/pla-plasma)), not by plasmactl plugins:
+
+- `platform:prepare` - Prepare runtime environment (optional)
+- `platform:deploy` - Deploy to target cluster (required)
+
+These are discovered from `src/platform/actions/` in your platform repository.
 
 ## Getting Started
 
@@ -64,18 +121,14 @@ After installation, explore available commands:
 
 ```bash
 plasmactl --help
+plasmactl package:compose --help
+plasmactl component:bump --help
+plasmactl platform:ship --help
 ```
-
-### Common Commands
-
-- `plasmactl bump` - Bump component versions
-- `plasmactl ship` - Deploy platform components
-- `plasmactl compose` - Manage package composition
-- `plasmactl update` - Update plasmactl to the latest version
 
 ## Documentation
 
-- [Plasma Platform Documentation](https://plasma.sh)
+- [Plasma Platform](https://plasma.sh) - Platform documentation
 - [GitHub Repository](https://github.com/plasmash/plasmactl)
 - [Report Issues](https://github.com/plasmash/plasmactl/issues)
 
@@ -85,14 +138,9 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 
 ## License
 
-This project is licensed under the Apache License 2.0 - see the LICENSE file for details.
+[European Union Public License 1.2 (EUPL-1.2)](LICENSE)
 
 ## Support
 
 - **Issues**: [GitHub Issues](https://github.com/plasmash/plasmactl/issues)
 - **Website**: [plasma.sh](https://plasma.sh)
-- **Community**: Join our community discussions on GitHub
-
----
-
-Built with ❤️ by the Plasma community
