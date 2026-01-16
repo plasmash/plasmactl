@@ -1,5 +1,4 @@
 PLUGIN_LIST := \
-  github.com/launchrctl/compose@v0.16.0 \
   github.com/launchrctl/scaffold@v0.1.1 \
   github.com/launchrctl/keyring@v0.7.0 \
   github.com/launchrctl/launchr@v0.22.0 \
