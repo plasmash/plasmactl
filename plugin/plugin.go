@@ -2,53 +2,59 @@
 package plugin
 
 import (
-	"os"
-	"path/filepath"
+	"strings"
 
 	"github.com/launchrctl/launchr"
 	"github.com/launchrctl/launchr/pkg/action"
 )
 
-// Plasma project directory structure constants.
-const (
-	// srcDir is the standard Plasma project source directory.
-	srcDir = "src"
-	// composeMergedSrcDir is the src/ subdirectory where composed packages are merged.
-	composeMergedSrcDir = ".plasma/package/compose/merged/src"
-)
+// srcMarker is the marker used to identify src directory in action IDs.
+const srcMarker = "src."
 
 func init() {
 	launchr.RegisterPlugin(&Plugin{})
 }
 
 // Plugin is the core plasmactl plugin that sets up Plasma project conventions.
-type Plugin struct{}
+type Plugin struct {
+	am action.Manager
+}
 
 // PluginInfo implements [launchr.Plugin] interface.
 func (p *Plugin) PluginInfo() launchr.PluginInfo {
-	// High weight to run early and set up discovery roots before other plugins.
+	// High weight to run early and set up ID provider before action discovery.
 	return launchr.PluginInfo{Weight: 1}
 }
 
 // OnAppInit implements [launchr.OnAppInitPlugin] interface.
 func (p *Plugin) OnAppInit(app launchr.App) error {
-	wd := app.GetWD()
+	// Get the action manager service.
+	app.Services().Get(&p.am)
 
-	// Register src/ as a discovery root if it exists.
-	// This allows actions at src/platform/actions/prepare/ to have ID "platform:prepare"
-	// instead of "src.platform:prepare".
-	srcPath := filepath.Join(wd, srcDir)
-	if stat, err := os.Stat(srcPath); err == nil && stat.IsDir() {
-		app.RegisterFS(action.NewDiscoveryFS(os.DirFS(srcPath), wd))
-	}
-
-	// Register composed packages src/ directory as a discovery root if it exists.
-	// This ensures actions at .plasma/package/compose/merged/src/platform/actions/...
-	// get clean IDs like "platform:prepare" instead of "src.platform:prepare".
-	composeSrcPath := filepath.Join(wd, composeMergedSrcDir)
-	if stat, err := os.Stat(composeSrcPath); err == nil && stat.IsDir() {
-		app.RegisterFS(action.NewDiscoveryFS(os.DirFS(composeSrcPath), wd))
-	}
+	// Set a custom ID provider that strips prefixes ending with "src." from action IDs.
+	// This ensures actions at src/platform/actions/prepare/ have ID "platform:prepare"
+	// instead of "src.platform:prepare", and actions at
+	// .plasma/package/compose/merged/src/platform/actions/prepare/ also get "platform:prepare"
+	// instead of ".plasma.package.compose.merged.src.platform:prepare".
+	p.am.SetActionIDProvider(&PlasmaIDProvider{})
 
 	return nil
+}
+
+// PlasmaIDProvider is an action ID provider that normalizes IDs for Plasma conventions.
+type PlasmaIDProvider struct{}
+
+// GetID implements [action.IDProvider] interface.
+// It strips any prefix ending with "src." from action IDs.
+func (idp *PlasmaIDProvider) GetID(a *action.Action) string {
+	// Use default ID generation first.
+	id := action.DefaultIDProvider{}.GetID(a)
+
+	// Find the last occurrence of "src." and strip everything before and including it.
+	// This handles both "src.platform:prepare" and ".plasma.package.compose.merged.src.platform:prepare".
+	if idx := strings.LastIndex(id, srcMarker); idx != -1 {
+		return id[idx+len(srcMarker):]
+	}
+
+	return id
 }
