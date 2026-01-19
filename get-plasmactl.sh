@@ -135,13 +135,13 @@ add_footer_note() {
 extension=""
 case "$os_raw" in
   Linux*)
-    os="Linux"
+    os="linux"
     ;;
   Darwin*)
-    os="Darwin"
+    os="darwin"
     ;;
   CYGWIN*|MINGW32*|MSYS*|MINGW*|Windows*)
-    os="Windows"
+    os="windows"
     extension=".exe"
     ;;
   *)
@@ -152,7 +152,7 @@ esac
 
 case "$arch_raw" in
   x86_64|amd64)
-    arch="x86_64"
+    arch="amd64"
     ;;
   arm64|aarch64)
     arch="arm64"
