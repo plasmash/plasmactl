@@ -7,7 +7,7 @@ PLUGIN_LIST := \
   github.com/launchrctl/web@v0.16.1 \
   github.com/plasmash/plasmactl-package@v1.1.13 \
   github.com/plasmash/plasmactl-component@v1.1.1 \
-  github.com/plasmash/plasmactl-platform@v1.3.1 \
+  github.com/plasmash/plasmactl-platform@v1.4.0 \
   github.com/plasmash/plasmactl-processors@v0.1.1
 
 # Local plugin replace directive (used in Makefile build command)
