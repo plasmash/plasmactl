@@ -2,11 +2,11 @@
 set -e
 #set -x
 
-# Get the operating system type
-os_raw=$(uname -s)
+# Get the operating system type (normalized to lowercase)
+os_raw=$(uname -s | tr '[:upper:]' '[:lower:]')
 
-# Get the machine architecture
-arch_raw=$(uname -m)
+# Get the machine architecture (normalized to lowercase)
+arch_raw=$(uname -m | tr '[:upper:]' '[:lower:]')
 
 # GitHub repository settings
 github_repo="plasmash/plasmactl"
@@ -134,13 +134,13 @@ add_footer_note() {
 # Determine the appropriate values for 'os', 'arch' and 'extension'
 extension=""
 case "$os_raw" in
-  Linux*)
+  linux*)
     os="linux"
     ;;
-  Darwin*)
+  darwin*)
     os="darwin"
     ;;
-  CYGWIN*|MINGW32*|MSYS*|MINGW*|Windows*)
+  cygwin*|mingw32*|msys*|mingw*|windows*)
     os="windows"
     extension=".exe"
     ;;
