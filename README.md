@@ -151,15 +151,6 @@ plasmactl component:bump
 plasmactl platform:up dev platform.interaction.observability
 ```
 
-## Platform-Specific Actions
-
-Some actions are provided by the platform package itself (e.g., [plasma-core](https://github.com/plasmash/pla-plasma)):
-
-- `platform:prepare` - Prepare runtime environment
-- `platform:deploy` - Deploy to target cluster
-
-These are discovered from `src/platform/actions/` in your platform repository.
-
 ## Getting Started
 
 After installation, explore available commands:
