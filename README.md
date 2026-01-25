@@ -47,75 +47,116 @@ plasmactl update
 
 ## Core Plugins
 
-Plasmactl uses a modular plugin system with three core plugins:
+Plasmactl uses a modular plugin system:
 
 | Plugin | Commands | Description |
 |--------|----------|-------------|
-| [plasmactl-package](https://github.com/plasmash/plasmactl-package) | `package:compose`, `package:add`, `package:update`, `package:delete` | Multi-package composition |
+| [plasmactl-model](https://github.com/plasmash/plasmactl-model) | `model:compose`, `model:prepare`, `model:bundle`, `model:release` | Model composition and preparation |
+| [plasmactl-platform](https://github.com/plasmash/plasmactl-platform) | `platform:up`, `platform:create`, `platform:deploy`, `config:*` | Platform lifecycle management |
+| [plasmactl-node](https://github.com/plasmash/plasmactl-node) | `node:provision`, `node:add`, `node:list`, `node:destroy` | Node provisioning and management |
+| [plasmactl-package](https://github.com/plasmash/plasmactl-package) | `package:compose`, `package:add`, `package:update`, `package:delete` | Package dependency management |
 | [plasmactl-component](https://github.com/plasmash/plasmactl-component) | `component:bump`, `component:sync`, `component:depend` | Version and dependency management |
-| [plasmactl-platform](https://github.com/plasmash/plasmactl-platform) | `platform:ship`, `platform:package`, `platform:publish`, `platform:release` | Platform lifecycle management |
 
-## Common Commands
+## Command Namespaces
 
-### Package Management
+### model:* - Model Composition
 
 ```bash
-# Compose packages from dependencies
-plasmactl package:compose
-
-# Add a package dependency
-plasmactl package:add --package my-package --url https://github.com/org/repo.git --ref main
+plasmactl model:compose              # Compose packages from compose.yaml
+plasmactl model:prepare              # Prepare for Ansible deployment
+plasmactl model:bundle               # Create .pm artifact
+plasmactl model:release              # Create git tag with changelog
 ```
 
-### Component Versioning
+### platform:* - Platform Management
 
 ```bash
-# Bump component versions after changes
+plasmactl platform:create ski-dev \  # Create platform scaffold
+  --metal-provider scaleway \
+  --dns-provider ovh \
+  --domain dev.skilld.cloud
+
+plasmactl platform:up dev target     # Full workflow: bump → compose → prepare → deploy
+plasmactl platform:deploy dev target # Deploy to platform
+plasmactl platform:list              # List platforms
+plasmactl platform:show ski-dev      # Show platform details
+plasmactl platform:destroy ski-dev   # Destroy platform
+```
+
+### node:* - Node Provisioning
+
+```bash
+plasmactl node:provision ski-dev \   # Provision infrastructure
+  -c foundation.cluster.control:GP1-L:3
+
+plasmactl node:register ski-dev \    # Manual node registration
+  --hostname server1 \
+  --public-ip 1.2.3.4
+
+plasmactl node:list ski-dev          # List nodes
+plasmactl node:destroy ski-dev srv1  # Destroy node
+```
+
+### config:* - Configuration Management
+
+```bash
+plasmactl config:get key             # Get config value
+plasmactl config:set key=value       # Set config value
+plasmactl config:list                # List config values
+plasmactl config:validate            # Validate configuration
+plasmactl config:rotate              # Rotate secrets
+```
+
+### package:* - Package Management
+
+```bash
+plasmactl package:compose            # Compose packages
+plasmactl package:add                # Add package dependency
+plasmactl package:update             # Update package dependency
+plasmactl package:delete pkg         # Remove package dependency
+```
+
+### component:* - Component Versioning
+
+```bash
+plasmactl component:bump             # Bump component versions
+plasmactl component:sync             # Propagate versions to dependencies
+plasmactl component:depend mrn       # Query/manage dependencies
+```
+
+## Typical Workflow
+
+### End-to-End Platform Setup
+
+```bash
+# 1. Create platform
+plasmactl platform:create ski-dev \
+  --metal-provider scaleway \
+  --dns-provider ovh \
+  --domain dev.skilld.cloud
+
+# 2. Provision infrastructure
+plasmactl node:provision ski-dev \
+  -c foundation.cluster.control:GP1-L:3
+
+# 3. Deploy
+plasmactl platform:up dev platform.foundation
+```
+
+### Daily Development
+
+```bash
+# Make changes, then:
 plasmactl component:bump
-
-# Propagate versions to dependencies
-plasmactl component:sync
-
-# Query component dependencies
-plasmactl component:depend platform.entities.person
-```
-
-### Platform Deployment
-
-```bash
-# Ship to an environment
-plasmactl platform:ship dev platform.interaction.observability
-
-# Create deployment artifact
-plasmactl platform:package
-
-# Publish artifact
-plasmactl platform:publish
-
-# Create release tag
-plasmactl platform:release
-```
-
-### Typical Workflow
-
-```bash
-# 1. Compose packages
-plasmactl package:compose
-
-# 2. Bump and sync versions
-plasmactl component:bump
-plasmactl component:sync
-
-# 3. Deploy to dev
-plasmactl platform:ship dev platform.interaction.observability
+plasmactl platform:up dev platform.interaction.observability
 ```
 
 ## Platform-Specific Actions
 
-Some actions are provided by the platform package itself (e.g., [plasma-core](https://github.com/plasmash/pla-plasma)), not by plasmactl plugins:
+Some actions are provided by the platform package itself (e.g., [plasma-core](https://github.com/plasmash/pla-plasma)):
 
-- `platform:prepare` - Prepare runtime environment (optional)
-- `platform:deploy` - Deploy to target cluster (required)
+- `platform:prepare` - Prepare runtime environment
+- `platform:deploy` - Deploy to target cluster
 
 These are discovered from `src/platform/actions/` in your platform repository.
 
@@ -125,9 +166,9 @@ After installation, explore available commands:
 
 ```bash
 plasmactl --help
-plasmactl package:compose --help
-plasmactl component:bump --help
-plasmactl platform:ship --help
+plasmactl model:compose --help
+plasmactl platform:up --help
+plasmactl node:provision --help
 ```
 
 ## Documentation
