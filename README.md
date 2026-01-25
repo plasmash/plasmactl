@@ -54,7 +54,6 @@ Plasmactl uses a modular plugin system:
 | [plasmactl-model](https://github.com/plasmash/plasmactl-model) | `model:compose`, `model:prepare`, `model:bundle`, `model:release` | Model composition and preparation |
 | [plasmactl-platform](https://github.com/plasmash/plasmactl-platform) | `platform:up`, `platform:create`, `platform:deploy`, `config:*` | Platform lifecycle management |
 | [plasmactl-node](https://github.com/plasmash/plasmactl-node) | `node:provision`, `node:add`, `node:list`, `node:destroy` | Node provisioning and management |
-| [plasmactl-package](https://github.com/plasmash/plasmactl-package) | `package:compose`, `package:add`, `package:update`, `package:delete` | Package dependency management |
 | [plasmactl-component](https://github.com/plasmash/plasmactl-component) | `component:bump`, `component:sync`, `component:depend` | Version and dependency management |
 
 ## Command Namespaces
@@ -105,15 +104,6 @@ plasmactl config:set key=value       # Set config value
 plasmactl config:list                # List config values
 plasmactl config:validate            # Validate configuration
 plasmactl config:rotate              # Rotate secrets
-```
-
-### package:* - Package Management
-
-```bash
-plasmactl package:compose            # Compose packages
-plasmactl package:add                # Add package dependency
-plasmactl package:update             # Update package dependency
-plasmactl package:delete pkg         # Remove package dependency
 ```
 
 ### component:* - Component Versioning
