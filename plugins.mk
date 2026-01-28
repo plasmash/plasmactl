@@ -8,7 +8,7 @@ PLUGIN_LIST := \
   github.com/plasmash/plasmactl-model@v1.2.1 \
   github.com/plasmash/plasmactl-component@v1.2.1 \
   github.com/plasmash/plasmactl-platform@v1.5.1 \
-  github.com/plasmash/plasmactl-node@v1.0.1 \
+  github.com/plasmash/plasmactl-node@v1.0.2 \
   github.com/plasmash/plasmactl-chassis@v1.0.1 \
   github.com/plasmash/plasmactl-processors@v0.1.1
 
