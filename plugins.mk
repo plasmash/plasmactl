@@ -3,7 +3,7 @@ PLUGIN_LIST := \
   github.com/launchrctl/scaffold@v0.1.1 \
   github.com/launchrctl/keyring@v0.9.0 \
   github.com/launchrctl/launchr@v0.22.0 \
-  github.com/launchrctl/update@v1.1.3 \
+  github.com/launchrctl/update@v1.1.4 \
   github.com/launchrctl/web@v0.16.1 \
   github.com/plasmash/plasmactl-model@v1.2.1 \
   github.com/plasmash/plasmactl-component@v1.2.2 \
