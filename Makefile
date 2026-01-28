@@ -59,7 +59,7 @@ provision:
 	echo '${LAUNCHR_BINARY_CHECKSUM_EXPECTED} ${BINARY_NAME}' | sha256sum --check
 	chmod +x ${BINARY_NAME}
 	@echo "-- Building binary with update plugin..."
-	./${BINARY_NAME} build --no-cache --timeout 500s -vvv --tag nethttpomithttp2 -p github.com/launchrctl/update@v1.1.2 -n plasmactl -o ${BINARY_NAME} --build-version ${LAUNCHR_BINARY_RELEASE_VERSION}
+	./${BINARY_NAME} build --no-cache --timeout 500s -vvv --tag nethttpomithttp2 -p github.com/launchrctl/update@v1.1.3 -n plasmactl -o ${BINARY_NAME} --build-version ${LAUNCHR_BINARY_RELEASE_VERSION}
 	@echo "-- Done."
 	@echo
 
