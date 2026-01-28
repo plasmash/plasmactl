@@ -13,7 +13,7 @@ endif
 LAUNCHR_BINARY_CHECKSUM_EXPECTED := $(shell curl -sL ${BINARY_URL}/releases/latest/download/checksums.txt | grep "${BINARY_NAME}" | awk '{print $$1}')
 LAUNCHR_BINARY_RELEASE_VERSION := $(shell curl -s https://api.github.com/repos/launchrctl/launchr/releases/latest | grep '"tag_name":' | sed -E 's/.*"([^"]+)".*/\1/')
 
-TARGET_OSES := Darwin Linux Windows
+TARGET_OSES := darwin linux windows
 TARGET_ARCHES := amd64 arm64
 
 TARGET_VERSION :=
@@ -28,7 +28,7 @@ BUILD_LOG_FILE := build.log
 
 .PHONY: binaries
 ## Build plasmactl binaries for all platforms
-binaries: check provision build legacy-naming
+binaries: check provision build
 	@echo "-- Build complete!"
 	@echo "-- Artifacts:"
 	@ls -lah plasmactl_*
@@ -69,38 +69,15 @@ build:
 	@echo "- Action: build"
 	@echo "-- Building plasmactl (launchr + plugins) binaries compatible with multiple OS & Arch..."
 	$(foreach TARGET_OS,$(TARGET_OSES), \
-		$(eval GOOS := $(shell echo $(TARGET_OS) | tr '[:upper:]' '[:lower:]')) \
 		$(eval EXTENSION :=) \
-		$(if $(filter Windows,$(TARGET_OS)), $(eval EXTENSION := .exe)) \
+		$(if $(filter windows,$(TARGET_OS)), $(eval EXTENSION := .exe)) \
 		$(foreach TARGET_ARCH,$(TARGET_ARCHES), \
-			$(eval ARCH_NAME := $(if $(filter amd64,$(TARGET_ARCH)),x86_64,$(if $(filter arm64,$(TARGET_ARCH)),arm64,$(TARGET_ARCH)))) \
-			echo "Compiling artifact plasmactl_${TARGET_OS}_${ARCH_NAME}${EXTENSION}..." ; \
-			GOOS=$(GOOS) GOARCH=$(TARGET_ARCH) ./${BINARY_NAME} build --no-cache --timeout 500s -vvv --tag nethttpomithttp2 -p ${TARGET_PLUGINS} $(if ${LOCAL_PLUGIN_REPLACE},-r ${LOCAL_PLUGIN_REPLACE}) -n plasmactl -o "plasmactl_${TARGET_OS}_${ARCH_NAME}${EXTENSION}" --build-version ${TARGET_VERSION} 2>&1 | tee ${BUILD_LOG_FILE} ; \
+			echo "Compiling artifact plasmactl_$(TARGET_OS)_$(TARGET_ARCH)$(EXTENSION)..." ; \
+			GOOS=$(TARGET_OS) GOARCH=$(TARGET_ARCH) ./${BINARY_NAME} build --no-cache --timeout 500s -vvv --tag nethttpomithttp2 -p ${TARGET_PLUGINS} $(if ${LOCAL_PLUGIN_REPLACE},-r ${LOCAL_PLUGIN_REPLACE}) -n plasmactl -o "plasmactl_$(TARGET_OS)_$(TARGET_ARCH)$(EXTENSION)" --build-version ${TARGET_VERSION} 2>&1 | tee ${BUILD_LOG_FILE} ; \
 		) \
 	)
 	@echo "-- Artifacts generated:"
 	@ls -lah | grep plasmactl_
-	@echo "-- Done."
-	@echo
-
-SRC_BINS := \
-  plasmactl_Darwin_arm64       \
-  plasmactl_Darwin_x86_64      \
-  plasmactl_Linux_arm64        \
-  plasmactl_Linux_x86_64       \
-  plasmactl_Windows_arm64.exe  \
-  plasmactl_Windows_x86_64.exe
-.PHONY: legacy-naming
-legacy-naming: $(SRC_BINS)
-	@echo "-- Also creating binaries with old backward-compatible naming:"
-	@for f in $(SRC_BINS); do \
-	  dst=$$(echo "$$f" | tr '[:upper:]' '[:lower:]'); \
-	  if echo "$$dst" | grep -q 'x86_64'; then \
-	    dst=$$(echo "$$dst" | sed 's/x86_64/amd64/'); \
-	  fi; \
-	  echo "Copying $$f → $$dst"; \
-	  cp "$$f" "$$dst"; \
-	done
 	@echo "-- Done."
 	@echo
 
