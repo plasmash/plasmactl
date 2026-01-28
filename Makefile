@@ -52,7 +52,7 @@ provision:
 	@echo
 	@echo "- Action: provision"
 	@echo "-- Writing config file for update plugin..."
-	@echo "repository_url: 'https://github.com/plasmash/plasmactl/releases/download'" > launchr-update.yaml
+	@printf "repository_url: 'https://github.com/plasmash/plasmactl/releases/download'\nbin_mask: '{{.URL}}/{{.Version}}/plasmactl_{{.OS}}_{{.Arch}}{{.Ext}}'\n" > launchr-update.yaml
 	@echo "-- Getting latest launchr binary file (release: ${LAUNCHR_BINARY_RELEASE_VERSION}) compatible with your OS & Arch..."
 	curl -O -L ${BINARY_URL}/releases/latest/download/${BINARY_NAME}
 	@echo "-- Comparing checksums..."
