@@ -1,0 +1,2 @@
+repository_url: 'https://github.com/plasmash/plasmactl/releases/download'
+bin_mask: '{{.URL}}/{{.Version}}/plasmactl_{{.OS}}_{{.Arch}}{{.Ext}}'
