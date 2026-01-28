@@ -13,4 +13,5 @@ PLUGIN_LIST := \
   github.com/plasmash/plasmactl-processors@v0.1.1
 
 # Local plugin replace directive (used in Makefile build command)
-LOCAL_PLUGIN_REPLACE := github.com/plasmash/plasmactl/plugin=./plugin
+# Commented out for release builds - uncomment for local development
+# LOCAL_PLUGIN_REPLACE := github.com/plasmash/plasmactl/plugin=./plugin
