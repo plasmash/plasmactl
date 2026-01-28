@@ -1,5 +1,5 @@
 PLUGIN_LIST := \
-  github.com/plasmash/plasmactl/plugin \
+  github.com/plasmash/plasmactl/plugin@v0.4.0 \
   github.com/launchrctl/scaffold@v0.1.1 \
   github.com/launchrctl/keyring@v0.9.0 \
   github.com/launchrctl/launchr@v0.22.0 \

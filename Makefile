@@ -75,7 +75,7 @@ build:
 		$(foreach TARGET_ARCH,$(TARGET_ARCHES), \
 			$(eval ARCH_NAME := $(if $(filter amd64,$(TARGET_ARCH)),x86_64,$(if $(filter arm64,$(TARGET_ARCH)),arm64,$(TARGET_ARCH)))) \
 			echo "Compiling artifact plasmactl_${TARGET_OS}_${ARCH_NAME}${EXTENSION}..." ; \
-			GOOS=$(GOOS) GOARCH=$(TARGET_ARCH) ./${BINARY_NAME} build --no-cache --timeout 500s -vvv --tag nethttpomithttp2 -p ${TARGET_PLUGINS} -r ${LOCAL_PLUGIN_REPLACE} -n plasmactl -o "plasmactl_${TARGET_OS}_${ARCH_NAME}${EXTENSION}" --build-version ${TARGET_VERSION} 2>&1 | tee ${BUILD_LOG_FILE} ; \
+			GOOS=$(GOOS) GOARCH=$(TARGET_ARCH) ./${BINARY_NAME} build --no-cache --timeout 500s -vvv --tag nethttpomithttp2 -p ${TARGET_PLUGINS} $(if ${LOCAL_PLUGIN_REPLACE},-r ${LOCAL_PLUGIN_REPLACE}) -n plasmactl -o "plasmactl_${TARGET_OS}_${ARCH_NAME}${EXTENSION}" --build-version ${TARGET_VERSION} 2>&1 | tee ${BUILD_LOG_FILE} ; \
 		) \
 	)
 	@echo "-- Artifacts generated:"
