@@ -5,11 +5,12 @@ PLUGIN_LIST := \
   github.com/launchrctl/launchr@v0.22.0 \
   github.com/launchrctl/update@v1.1.4 \
   github.com/launchrctl/web@v0.16.1 \
-  github.com/plasmash/plasmactl-model@v1.5.2 \
-  github.com/plasmash/plasmactl-component@v1.2.3 \
-  github.com/plasmash/plasmactl-platform@v1.5.1 \
-  github.com/plasmash/plasmactl-node@v1.0.4 \
-  github.com/plasmash/plasmactl-zone@v1.0.20 \
+  github.com/plasmash/plasmactl-auth@v0.1.0 \
+  github.com/plasmash/plasmactl-model@v1.7.0 \
+  github.com/plasmash/plasmactl-component@v1.2.5 \
+  github.com/plasmash/plasmactl-platform@v1.7.0 \
+  github.com/plasmash/plasmactl-node@v1.2.0 \
+  github.com/plasmash/plasmactl-zone@v1.1.1 \
   github.com/plasmash/plasmactl-processors@v0.1.1
 
 # Local plugin replace directive (used in Makefile build command)
