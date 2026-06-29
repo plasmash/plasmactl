@@ -55,6 +55,9 @@ Plasmactl uses a modular plugin system:
 | [plasmactl-platform](https://github.com/plasmash/plasmactl-platform) | `platform:up`, `platform:create`, `platform:deploy` | Platform lifecycle management |
 | [plasmactl-node](https://github.com/plasmash/plasmactl-node) | `node:provision`, `node:add`, `node:list`, `node:destroy` | Node provisioning and management |
 | [plasmactl-component](https://github.com/plasmash/plasmactl-component) | `component:bump`, `component:sync`, `component:depend` | Version and dependency management |
+| [plasmactl-zone](https://github.com/plasmash/plasmactl-zone) | `zone:add`, `zone:list`, `zone:show`, `zone:remove` | Topology structure — zones and node allocations |
+| [plasmactl-auth](https://github.com/plasmash/plasmactl-auth) | `auth:login`, `auth:logout`, `auth:status` | Infrastructure provider authentication |
+| [plasmactl-processors](https://github.com/plasmash/plasmactl-processors) | template functions | Template processors (e.g. Ansible Vault) |
 
 ## Command Namespaces
 
@@ -94,6 +97,17 @@ plasmactl node:add ski-dev \         # Manual node registration
 
 plasmactl node:list ski-dev          # List nodes
 plasmactl node:destroy ski-dev srv1  # Destroy node
+```
+
+### zone:* - Topology
+
+Zones are the units of the platform topology — nodes allocate to them, Agents and Applications attach to them.
+
+```bash
+plasmactl zone:add cognition.data    # Add a zone to the topology
+plasmactl zone:list                  # List zones
+plasmactl zone:show cognition.data   # Show a zone (allocated nodes, attached components)
+plasmactl zone:remove cognition.data # Remove a zone
 ```
 
 ### Configuration & secrets
