@@ -52,7 +52,7 @@ Plasmactl uses a modular plugin system:
 | Plugin | Commands | Description |
 |--------|----------|-------------|
 | [plasmactl-model](https://github.com/plasmash/plasmactl-model) | `model:compose`, `model:prepare`, `model:bundle`, `model:release` | Model composition and preparation |
-| [plasmactl-platform](https://github.com/plasmash/plasmactl-platform) | `platform:up`, `platform:create`, `platform:deploy`, `config:*` | Platform lifecycle management |
+| [plasmactl-platform](https://github.com/plasmash/plasmactl-platform) | `platform:up`, `platform:create`, `platform:deploy` | Platform lifecycle management |
 | [plasmactl-node](https://github.com/plasmash/plasmactl-node) | `node:provision`, `node:add`, `node:list`, `node:destroy` | Node provisioning and management |
 | [plasmactl-component](https://github.com/plasmash/plasmactl-component) | `component:bump`, `component:sync`, `component:depend` | Version and dependency management |
 
@@ -88,7 +88,7 @@ plasmactl platform:destroy ski-dev   # Destroy platform
 plasmactl node:provision ski-dev \   # Provision infrastructure
   -c foundation.cluster.control:GP1-L:3
 
-plasmactl node:register ski-dev \    # Manual node registration
+plasmactl node:add ski-dev \         # Manual node registration
   --hostname server1 \
   --public-ip 1.2.3.4
 
@@ -96,14 +96,13 @@ plasmactl node:list ski-dev          # List nodes
 plasmactl node:destroy ski-dev srv1  # Destroy node
 ```
 
-### config:* - Configuration Management
+### Configuration & secrets
 
 ```bash
-plasmactl config:get key             # Get config value
-plasmactl config:set key=value       # Set config value
-plasmactl config:list                # List config values
-plasmactl config:validate            # Validate configuration
-plasmactl config:rotate              # Rotate secrets
+plasmactl component:configure key value --vault  # Component/zone config (optionally vaulted)
+plasmactl keyring:set key value                  # Store a credential in the keyring
+plasmactl keyring:list                           # List stored credentials
+plasmactl auth:login                             # Authenticate to an infrastructure provider
 ```
 
 ### component:* - Component Versioning
