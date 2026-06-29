@@ -59,7 +59,7 @@ provision:
 	echo '${LAUNCHR_BINARY_CHECKSUM_EXPECTED} ${BINARY_NAME}' | sha256sum --check
 	chmod +x ${BINARY_NAME}
 	@echo "-- Building binary with update plugin..."
-	./${BINARY_NAME} build --no-cache --timeout 500s -vvv --tag nethttpomithttp2 -p github.com/launchrctl/update@v1.1.4 -n plasmactl -o ${BINARY_NAME} --build-version ${LAUNCHR_BINARY_RELEASE_VERSION}
+	./${BINARY_NAME} build --no-cache --timeout 500s -vvv --tag nethttpomithttp2 -p github.com/launchrctl/update@v1.1.4 -n plasmactl --out-file ${BINARY_NAME} --build-version ${LAUNCHR_BINARY_RELEASE_VERSION}
 	@echo "-- Done."
 	@echo
 
@@ -73,7 +73,7 @@ build:
 		$(if $(filter windows,$(TARGET_OS)), $(eval EXTENSION := .exe)) \
 		$(foreach TARGET_ARCH,$(TARGET_ARCHES), \
 			echo "Compiling artifact plasmactl_$(TARGET_OS)_$(TARGET_ARCH)$(EXTENSION)..." ; \
-			GOOS=$(TARGET_OS) GOARCH=$(TARGET_ARCH) ./${BINARY_NAME} build --no-cache --timeout 500s -vvv --tag nethttpomithttp2 -p ${TARGET_PLUGINS} $(if ${LOCAL_PLUGIN_REPLACE},-r ${LOCAL_PLUGIN_REPLACE}) -n plasmactl -o "plasmactl_$(TARGET_OS)_$(TARGET_ARCH)$(EXTENSION)" --build-version ${TARGET_VERSION} 2>&1 | tee ${BUILD_LOG_FILE} ; \
+			GOOS=$(TARGET_OS) GOARCH=$(TARGET_ARCH) ./${BINARY_NAME} build --no-cache --timeout 500s -vvv --tag nethttpomithttp2 -p ${TARGET_PLUGINS} $(if ${LOCAL_PLUGIN_REPLACE},-r ${LOCAL_PLUGIN_REPLACE}) -n plasmactl --out-file "plasmactl_$(TARGET_OS)_$(TARGET_ARCH)$(EXTENSION)" --build-version ${TARGET_VERSION} 2>&1 | tee ${BUILD_LOG_FILE} ; \
 		) \
 	)
 	@echo "-- Artifacts generated:"
