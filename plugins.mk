@@ -7,7 +7,7 @@ PLUGIN_LIST := \
   github.com/launchrctl/web@v0.16.1 \
   github.com/plasmash/plasmactl-auth@v0.1.0 \
   github.com/plasmash/plasmactl-model@v1.8.1 \
-  github.com/plasmash/plasmactl-component@v1.3.2 \
+  github.com/plasmash/plasmactl-component@v1.3.3 \
   github.com/plasmash/plasmactl-platform@v1.8.1 \
   github.com/plasmash/plasmactl-node@v1.4.1 \
   github.com/plasmash/plasmactl-zone@v1.2.1 \
